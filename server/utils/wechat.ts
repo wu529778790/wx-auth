@@ -227,10 +227,42 @@ export function generateVerificationCode(): string {
 
 /**
  * 检查消息内容是否包含关键词
+ * 支持模糊匹配，处理可能的编码问题
  */
 export function containsAuthKeyword(content: string): boolean {
   const keywords = ['已关注', '认证', '验证', 'login', '已订阅', '关注了', '验证码'];
-  return keywords.some(k => content.includes(k));
+
+  // 1. 精确匹配
+  if (keywords.some(k => content.includes(k))) {
+    return true;
+  }
+
+  // 2. 模糊匹配（处理乱码）
+  // 将内容转换为字节数组，尝试匹配部分字符
+  const contentBytes = Buffer.from(content, 'utf8');
+
+  // 检查"验证码"的UTF-8字节序列：e9 aa 8c e8 af 81 e7 a0 81
+  // 如果内容包含这些字节的任何部分，也认为匹配
+  const patterns = [
+    Buffer.from('验证码'), // 正常
+    Buffer.from([0xe9, 0xaa, 0x8c]), // 验的前3字节
+    Buffer.from([0xe8, 0xaf, 0x81]), // 证的前3字节
+    Buffer.from([0xe7, 0xa0, 0x81]), // 码的前3字节
+  ];
+
+  for (const pattern of patterns) {
+    if (contentBytes.includes(pattern)) {
+      console.log('[WeChat] 模糊匹配成功:', pattern.toString('hex'));
+      return true;
+    }
+  }
+
+  // 3. 检查是否有乱码但包含"验"或"证"或"码"
+  if (content.includes('验') || content.includes('证') || content.includes('码')) {
+    return true;
+  }
+
+  return false;
 }
 
 /**

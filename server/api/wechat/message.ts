@@ -115,6 +115,8 @@ export default defineEventHandler(async (event) => {
       const { MsgType, Event, FromUserName, ToUserName, Content } = message;
 
       console.log('[WeChat] 消息详情:', { MsgType, Event, FromUserName, Content });
+      console.log('[WeChat] Content Hex:', Content ? Buffer.from(Content).toString('hex') : 'null');
+      console.log('[WeChat] Content 长度:', Content ? Content.length : 0);
 
       // 处理消息逻辑
       let replyMsg = '';
@@ -133,8 +135,30 @@ export default defineEventHandler(async (event) => {
         replyMsg = welcomeMsg + codeMsg;
 
       } else if (MsgType === 'text') {
-        const content = (Content || '').trim();
+        // 修复编码问题：处理可能的乱码
+        let content = (Content || '').trim();
+
+        // 如果内容包含乱码，尝试修复
+        if (content.includes('�') || Buffer.from(content).toString('hex').includes('efbfbd')) {
+          console.log('[WeChat] 检测到乱码，原始内容:', content);
+          console.log('[WeChat] 原始Hex:', Buffer.from(content).toString('hex'));
+
+          // 尝试从原始body重新解析
+          try {
+            const bodyBuffer = Buffer.from(body);
+            const bodyStr = bodyBuffer.toString('utf8');
+            const parsedFromRaw = parseWeChatMessage(bodyStr);
+            if (parsedFromRaw.Content) {
+              content = parsedFromRaw.Content.trim();
+              console.log('[WeChat] 修复后内容:', content);
+            }
+          } catch (e) {
+            console.log('[WeChat] 修复失败:', e);
+          }
+        }
+
         console.log('[WeChat] 文本消息内容:', content);
+        console.log('[WeChat] 内容Hex:', Buffer.from(content).toString('hex'));
 
         // 状态查询
         if (isStatusKeyword(content)) {

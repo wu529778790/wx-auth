@@ -18,16 +18,22 @@ export default defineEventHandler(async (event) => {
     body: body,
     bodyType: typeof body,
     bodyLength: body ? body.length : 0,
-    bodyHex: body ? Buffer.from(body).toString('hex').substring(0, 200) : null,
-    bodyPreview: body ? body.substring(0, 500) : null
+    bodyHex: body ? Buffer.from(body).toString('hex') : null,
+    bodyPreview: body ? body.substring(0, 500) : null,
+    // 尝试不同编码
+    bodyUtf8: body ? Buffer.from(body).toString('utf8') : null,
+    bodyLatin1: body ? Buffer.from(body).toString('latin1') : null,
   };
 
   console.log('=== 微信消息诊断 ===');
   console.log('时间:', diagnostic.timestamp);
   console.log('查询参数:', diagnostic.query);
+  console.log('请求头:', JSON.stringify(diagnostic.headers, null, 2));
   console.log('Body长度:', diagnostic.bodyLength);
   console.log('Body内容:', diagnostic.bodyPreview);
   console.log('Body Hex:', diagnostic.bodyHex);
+  console.log('Body UTF8:', diagnostic.bodyUtf8);
+  console.log('Body Latin1:', diagnostic.bodyLatin1);
   console.log('完整诊断数据:', JSON.stringify(diagnostic, null, 2));
 
   // 保存到文件（如果需要）
