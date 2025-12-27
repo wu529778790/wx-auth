@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
       if (isEncrypted) {
         // ========== 安全模式（加密消息）==========
         // 验证消息签名
-        const encryptMatch = body.match(/<Encrypt><!\\[CDATA\\[(.*?)\\]\\]><\\/Encrypt>/);
+        const encryptMatch = body.match(/<Encrypt><![CDATA[(.*?)]]></Encrypt>/);
         if (!encryptMatch) {
           return 'Invalid encrypted message';
         }
