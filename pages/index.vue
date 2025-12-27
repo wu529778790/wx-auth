@@ -119,6 +119,58 @@
           <li>在网站输入验证码即可完成认证</li>
         </ul>
       </div>
+
+      <!-- 开发测试工具 -->
+      <div class="mt-4 bg-white/90 backdrop-blur rounded-xl p-4 text-sm text-gray-700 border-2 border-yellow-400">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold">🛠️ 开发测试工具</h3>
+          <button
+            @click="showTestTools = !showTestTools"
+            class="text-xs px-2 py-1 bg-yellow-100 hover:bg-yellow-200 rounded transition"
+          >
+            {{ showTestTools ? '隐藏' : '显示' }}
+          </button>
+        </div>
+
+        <div v-if="showTestTools" class="space-y-3 mt-3">
+          <p class="text-xs text-gray-500 mb-2">未接入微信公众号时，可用此工具模拟测试</p>
+
+          <div class="bg-gray-100 p-3 rounded-lg space-y-2">
+            <div class="flex gap-2 items-center">
+              <span class="text-xs font-semibold w-20">测试OpenID:</span>
+              <input
+                v-model="testOpenid"
+                placeholder="oxxx_testuser"
+                class="flex-1 px-2 py-1 text-xs border rounded"
+              />
+            </div>
+
+            <button
+              @click="simulateSubscribe"
+              :disabled="isSimulating"
+              class="w-full py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white rounded font-semibold transition"
+            >
+              <span v-if="isSimulating">模拟中...</span>
+              <span v-else>🎯 模拟关注公众号（生成验证码）</span>
+            </button>
+
+            <div v-if="generatedCode" class="bg-white p-3 rounded border border-yellow-300 text-center">
+              <p class="text-xs text-gray-500 mb-1">生成的验证码：</p>
+              <p class="text-2xl font-mono font-bold text-yellow-600">{{ generatedCode }}</p>
+              <p class="text-xs text-gray-500 mt-1">已自动填入输入框，可直接点击验证</p>
+            </div>
+          </div>
+
+          <div class="text-xs text-gray-500 bg-blue-50 p-2 rounded">
+            <p class="font-semibold mb-1">测试流程：</p>
+            <ol class="list-decimal list-inside space-y-1 ml-2">
+              <li>点击"模拟关注公众号"按钮</li>
+              <li>验证码会自动显示并填入</li>
+              <li>点击"验证"按钮完成登录</li>
+            </ol>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -129,6 +181,12 @@ const loading = ref(true);
 const verificationCode = ref('');
 const isVerifying = ref(false);
 const message = ref<{ type: string; text: string } | null>(null);
+
+// 测试工具状态
+const showTestTools = ref(false);
+const testOpenid = ref('oxxx_testuser_' + Math.floor(Math.random() * 10000));
+const isSimulating = ref(false);
+const generatedCode = ref('');
 
 // 检查是否有保存的openid（已认证过的用户）
 function getSavedOpenid(): string | null {
@@ -235,6 +293,50 @@ const requestNewCode = async () => {
   setTimeout(() => {
     message.value = { type: 'info', text: '如未关注公众号，请先扫码关注' };
   }, 3000);
+};
+
+// 模拟关注公众号（开发测试用）
+const simulateSubscribe = async () => {
+  if (!testOpenid.value) {
+    message.value = { type: 'error', text: '请输入测试OpenID' };
+    return;
+  }
+
+  isSimulating.value = true;
+  message.value = null;
+  generatedCode.value = '';
+
+  try {
+    // 调用测试接口（绕过签名验证）
+    const response = await fetch('/api/test/simulate-subscribe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        openid: testOpenid.value
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      generatedCode.value = result.code;
+      verificationCode.value = result.code; // 自动填入输入框
+
+      message.value = {
+        type: 'success',
+        text: `✅ 模拟成功！验证码已生成并填入，可直接点击验证`
+      };
+    } else {
+      message.value = { type: 'error', text: `❌ ${result.error}` };
+    }
+  } catch (error) {
+    console.error('模拟失败:', error);
+    message.value = { type: 'error', text: '❌ 模拟失败，请确保服务器正在运行' };
+  } finally {
+    isSimulating.value = false;
+  }
 };
 </script>
 
