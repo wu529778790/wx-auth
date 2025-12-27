@@ -56,14 +56,9 @@ export default defineEventHandler(async (event) => {
   if (method === 'POST') {
     const { signature, timestamp, nonce, encrypt_type, msg_signature } = getQuery(event);
 
-    console.log('[WeChat] URL参数:', { signature, timestamp, nonce, encrypt_type, msg_signature });
-
     try {
       const body = await readBody(event);
       if (!body) return 'Empty body';
-
-      console.log('[WeChat] 收到原始消息 (v2):', body);
-      console.log('[WeChat] 消息长度:', body.length);
 
       // 判断是否是加密消息（安全模式）
       const isEncrypted = encrypt_type === 'aes' || body.includes('<Encrypt>');
@@ -75,13 +70,6 @@ export default defineEventHandler(async (event) => {
       if (isEncrypted) {
         // ========== 安全模式（加密消息）==========
         console.log('[WeChat] 检测到加密消息，使用安全模式处理');
-        console.log('[WeChat] 配置检查:', {
-          hasToken: !!config.token,
-          hasAppId: !!config.appId,
-          hasAesKey: !!config.aesKey,
-          appIdValue: config.appId,
-          aesKeyPreview: config.aesKey ? config.aesKey.substring(0, 10) + '...' : 'undefined'
-        });
 
         // 验证消息签名
         const encryptMatch = body.match(/<Encrypt><!\[CDATA\[(.*?)\]\]><\/Encrypt>/);
@@ -127,16 +115,6 @@ export default defineEventHandler(async (event) => {
 
       const { MsgType, Event, FromUserName, ToUserName, Content } = message;
 
-      console.log('[WeChat] 解析消息:', {
-        MsgType,
-        Event,
-        FromUserName,
-        ToUserName,
-        Content,
-        contentType: typeof Content,
-        fullMessage: JSON.stringify(message)
-      });
-
       // 处理消息逻辑
       let replyMsg = '';
 
@@ -172,6 +150,7 @@ export default defineEventHandler(async (event) => {
           console.log(`[WeChat] 用户 ${FromUserName} 请求验证码，重新生成 ${existingCode}`);
 
           replyMsg = generateCodeMessage(existingCode);
+          console.log(`[WeChat] 回复消息内容:`, replyMsg);
         } else {
           // 默认回复
           replyMsg = '欢迎！如果您需要重新获取验证码，请发送"已关注"或"认证"。';
@@ -220,14 +199,15 @@ export default defineEventHandler(async (event) => {
 
       } else {
         // ========== 明文模式：直接回复 ==========
-        console.log('[WeChat] 使用明文模式回复');
-        return generateWeChatReply({
+        const replyXml = generateWeChatReply({
           ToUserName: FromUserName,
           FromUserName: ToUserName,
           CreateTime: Math.floor(Date.now() / 1000),
           MsgType: 'text',
           Content: replyMsg
         });
+        console.log('[WeChat] 明文模式回复内容:', replyXml);
+        return replyXml;
       }
 
     } catch (error) {
