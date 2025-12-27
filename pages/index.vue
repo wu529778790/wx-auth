@@ -1,99 +1,111 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
     <!-- 已认证状态 - 显示成功页面 -->
-    <div v-if="session?.authenticated" class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 animate-fade-in">
-      <div class="text-center mb-6">
-        <div class="text-6xl mb-2">🎉</div>
-        <h2 class="text-2xl font-bold text-gray-800">认证成功！</h2>
-        <p class="text-gray-600 mt-2">欢迎访问，您已完成公众号认证</p>
-      </div>
+    <div v-if="session?.authenticated" class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 animate-fade-in text-center">
+      <div class="text-6xl mb-4">🎉</div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">认证成功！</h2>
+      <p class="text-gray-600 mb-6">欢迎访问，您已完成公众号认证</p>
 
-      <div class="bg-gray-50 rounded-lg p-4 mb-6 space-y-2 text-sm">
+      <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-6 space-y-2 text-sm text-left">
         <div class="flex justify-between">
           <span class="text-gray-500">用户ID</span>
-          <span class="font-mono font-semibold">{{ session.user.openid.substring(0, 8) }}...</span>
+          <span class="font-mono font-semibold text-gray-700">{{ session.user.openid.substring(0, 8) }}...</span>
         </div>
         <div class="flex justify-between">
           <span class="text-gray-500">认证时间</span>
-          <span>{{ formatTime(session.user.authenticatedAt) }}</span>
+          <span class="text-gray-700">{{ formatTime(session.user.authenticatedAt) }}</span>
         </div>
         <div v-if="session.user.nickname" class="flex justify-between">
           <span class="text-gray-500">昵称</span>
-          <span>{{ session.user.nickname }}</span>
+          <span class="text-gray-700">{{ session.user.nickname }}</span>
         </div>
       </div>
 
       <button
         @click="logout"
-        class="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition"
+        class="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold transition shadow-sm"
       >
         退出登录
       </button>
     </div>
 
     <!-- 加载状态 -->
-    <div v-else-if="loading" class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center">
+    <div v-else-if="loading" class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 text-center">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
       <h2 class="text-xl font-bold text-gray-700">正在检查认证状态...</h2>
     </div>
 
-    <!-- 未认证状态 - 强制弹窗认证 -->
-    <div v-else class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-purple-600">
-      <!-- 强制认证弹窗 -->
-      <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 animate-scale-in relative">
-        <!-- 无关闭按钮 - 强制认证 -->
+    <!-- 未认证状态 - 认证弹窗 -->
+    <div v-else class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-purple-600/95 backdrop-blur-sm">
+      <!-- 美观的认证弹窗 -->
+      <div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl p-6 animate-scale-in relative overflow-hidden">
 
-        <!-- 弹窗头部 -->
-        <div class="text-center mb-4">
+        <!-- 装饰性背景 -->
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+
+        <!-- 头部 -->
+        <div class="text-center mb-6 mt-2">
           <div class="text-5xl mb-2">🔐</div>
-          <h2 class="text-2xl font-bold text-gray-800">完成身份认证</h2>
-          <p class="text-gray-600 text-sm mt-1">关注公众号获取验证码，继续访问</p>
+          <h2 class="text-xl font-bold text-gray-800">身份认证</h2>
+          <p class="text-gray-500 text-sm mt-1">关注公众号获取验证码</p>
         </div>
 
-        <!-- 操作步骤 -->
-        <div class="bg-blue-50 rounded-lg p-3 mb-4 space-y-2">
-          <div class="flex items-start gap-2">
-            <span class="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-            <span class="text-xs text-gray-700">扫码关注公众号</span>
-          </div>
-          <div class="flex items-start gap-2">
-            <span class="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-            <span class="text-xs text-gray-700">公众号自动发送6位验证码</span>
-          </div>
-          <div class="flex items-start gap-2">
-            <span class="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-            <span class="text-xs text-gray-700">输入验证码完成认证</span>
+        <!-- 公众号二维码区域 -->
+        <div class="mb-6">
+          <div class="bg-gray-50 rounded-2xl p-4 text-center border-2 border-dashed border-gray-300 hover:border-blue-400 transition">
+            <!-- 这里放你的公众号二维码图片 -->
+            <div class="w-40 h-40 mx-auto bg-white rounded-xl flex items-center justify-center mb-2">
+              <img
+                v-if="qrcodeUrl"
+                :src="qrcodeUrl"
+                alt="公众号二维码"
+                class="w-full h-full object-contain rounded-lg"
+              />
+              <div v-else class="text-gray-400 text-sm">
+                <div class="text-4xl mb-2">📷</div>
+                <div>公众号二维码</div>
+                <div class="text-xs mt-1">请配置二维码图片</div>
+              </div>
+            </div>
+            <div class="text-xs text-gray-600">
+              <div class="font-semibold text-gray-700 mb-1">微信扫码关注</div>
+              <div>或搜索公众号: <span class="font-mono text-blue-600">{{ wechatName }}</span></div>
+            </div>
           </div>
         </div>
 
-        <!-- 验证码输入 -->
-        <div class="bg-gray-50 rounded-lg p-3 mb-3">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">输入验证码</label>
+        <!-- 验证码输入区域 -->
+        <div class="space-y-3">
+          <label class="block text-sm font-semibold text-gray-700 text-center">
+            输入6位验证码
+          </label>
+
           <div class="flex gap-2">
             <input
               v-model="verificationCode"
-              placeholder="6位验证码"
+              placeholder="验证码"
               maxlength="6"
               @keyup.enter="verifyCode"
-              class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg text-center text-base font-mono tracking-widest focus:outline-none focus:border-blue-500"
+              class="flex-1 px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-center text-lg font-mono tracking-widest focus:outline-none focus:border-blue-500 focus:bg-white transition"
             />
             <button
               @click="verifyCode"
               :disabled="isVerifying || !verificationCode"
-              class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white rounded-lg font-semibold transition text-sm whitespace-nowrap"
+              class="px-5 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition shadow-md"
             >
-              <span v-if="isVerifying">验证中...</span>
+              <span v-if="isVerifying" class="animate-pulse">验证中</span>
               <span v-else>验证</span>
             </button>
           </div>
-          <p class="text-xs text-gray-500 mt-1 text-center">验证码5分钟内有效</p>
+
+          <p class="text-xs text-gray-400 text-center">验证码5分钟内有效</p>
         </div>
 
-        <!-- 状态提示 -->
+        <!-- 消息提示 -->
         <div
           v-if="message"
           :class="[
-            'p-2 rounded-lg text-xs text-center mb-3 animate-fade-in',
+            'mt-3 p-3 rounded-xl text-sm text-center animate-fade-in',
             message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' :
             message.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' :
             message.type === 'warning' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
@@ -106,15 +118,14 @@
         <!-- 操作按钮 -->
         <button
           @click="requestNewCode"
-          class="w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition text-sm"
+          class="w-full py-3 mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition"
         >
-          没收到验证码？点击重新获取
+          没收到验证码？重新获取
         </button>
 
         <!-- 底部说明 -->
-        <div class="mt-3 text-xs text-gray-500 text-center bg-gray-50 rounded p-2">
+        <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center">
           <p>🔒 本系统需要认证后才能访问</p>
-          <p>请先关注公众号完成认证</p>
         </div>
       </div>
     </div>
@@ -127,6 +138,10 @@ const loading = ref(true);
 const verificationCode = ref('');
 const isVerifying = ref(false);
 const message = ref<{ type: string; text: string } | null>(null);
+
+// 配置信息
+const wechatName = ref('你的公众号名称'); // 修改为你的公众号名称
+const qrcodeUrl = ref(''); // 如果有二维码图片URL，填在这里
 
 // 检查是否有保存的openid（已认证过的用户）
 function getSavedOpenid(): string | null {
@@ -238,7 +253,7 @@ const requestNewCode = async () => {
 
   // 如果有公众号二维码，可以显示
   setTimeout(() => {
-    message.value = { type: 'info', text: '如未关注公众号，请先扫码关注' };
+    message.value = { type: 'info', text: '如未关注公众号，请先扫码关注上方二维码' };
   }, 3000);
 };
 </script>
@@ -260,5 +275,21 @@ const requestNewCode = async () => {
 
 .animate-scale-in {
   animation: scaleIn 0.3s ease;
+}
+
+/* 输入框聚焦动画 */
+input:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* 按钮悬停效果 */
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
 }
 </style>
