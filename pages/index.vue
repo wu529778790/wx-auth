@@ -124,8 +124,9 @@
         </button>
 
         <!-- 底部说明 -->
-        <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center">
+        <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center space-y-1">
           <p>🔒 本系统需要认证后才能访问</p>
+          <p class="text-gray-500">💡 关注后发送"验证码"获取认证码</p>
         </div>
       </div>
     </div>
@@ -250,7 +251,7 @@ const verifyCode = async () => {
 
 // 请求重新发送验证码
 const requestNewCode = async () => {
-  message.value = { type: 'info', text: '请在微信中发送"已关注"或"认证"重新获取验证码' };
+  message.value = { type: 'info', text: '请在微信公众号中发送"验证码"重新获取认证码' };
 
   // 如果有公众号二维码，可以显示
   setTimeout(() => {
