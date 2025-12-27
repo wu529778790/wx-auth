@@ -34,47 +34,27 @@ export function decryptWeChatMessage(
   appId: string
 ): string {
   try {
-    console.log('[Decrypt] 开始解密');
-    console.log('[Decrypt] AES Key (前10位):', aesKey.substring(0, 10));
-    console.log('[Decrypt] AppID:', appId);
-    console.log('[Decrypt] 加密消息长度:', encryptMsg.length);
-    console.log('[Decrypt] 加密消息 (前50字符):', encryptMsg.substring(0, 50));
-
     // 1. EncodingAESKey 转换为 32字节AES密钥
     // 微信的 EncodingAESKey 是43位Base64字符，需要添加 '=' 补全为44位
     const key = Buffer.from(aesKey + '=', 'base64');
-    console.log('[Decrypt] Key长度:', key.length, 'Key (hex):', key.toString('hex').substring(0, 40));
-
     const iv = key.slice(0, 16);
-    console.log('[Decrypt] IV (hex):', iv.toString('hex'));
-
     const cipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
 
     // 2. Base64解码
     const encrypted = Buffer.from(encryptMsg, 'base64');
-    console.log('[Decrypt] 加密数据长度:', encrypted.length, 'Hex:', encrypted.toString('hex').substring(0, 60));
 
     // 3. 解密
     let decrypted = cipher.update(encrypted);
     decrypted = Buffer.concat([decrypted, cipher.final()]);
-    console.log('[Decrypt] 解密后长度:', decrypted.length, 'Hex:', decrypted.toString('hex').substring(0, 100));
 
     // 4. 去除 PKCS#7 填充
     const padLen = decrypted[decrypted.length - 1];
-    console.log('[Decrypt] 填充长度:', padLen);
-
     const unpadded = decrypted.slice(0, decrypted.length - padLen);
-    console.log('[Decrypt] 去填充后长度:', unpadded.length, 'Hex:', unpadded.toString('hex').substring(0, 100));
 
     // 5. 解析报文格式：随机16字节 + 消息长度(4字节) + 消息内容 + AppID
     const msgLen = unpadded.readUInt32BE(16);
-    console.log('[Decrypt] 消息长度字段:', msgLen);
-
     const content = unpadded.slice(20, 20 + msgLen).toString('utf8');
     const appIdFromMsg = unpadded.slice(20 + msgLen).toString('utf8');
-
-    console.log('[Decrypt] 解析内容:', content.substring(0, 100));
-    console.log('[Decrypt] 解析AppID:', appIdFromMsg);
 
     // 6. 验证AppID
     if (appIdFromMsg !== appId) {
