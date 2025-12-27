@@ -172,30 +172,115 @@ const verifyCode = async () => {
 
 ## 🚀 部署指南
 
-### Vercel（推荐 - 免费）
+### 场景 1: 部署到 Vercel（推荐 - 免费）
 
 ```bash
+# 1. 安装 Vercel CLI
+npm i -g vercel
+
+# 2. 部署
 pnpm build
 vercel --prod
 ```
 
-部署时需要配置的环境变量：
-- `SITE_URL`
-- `WECHAT_TOKEN`
-- `SESSION_SECRET`
+**Vercel 环境变量配置：**
+登录 Vercel 控制台 → 选择项目 → Settings → Environment Variables
 
-### Docker
+| 变量名 | 值 | 说明 |
+|--------|-----|------|
+| `SITE_URL` | `https://your-main-site.com` | 你的域名 |
+| `WECHAT_TOKEN` | `你的Token` | 与微信后台一致 |
+| `SESSION_SECRET` | `openssl rand -hex 32` 生成的随机值 | 加密密钥 |
+
+### 场景 2: 部署到自有服务器（VPS/云服务器）
+
+```bash
+# 1. 克隆代码
+git clone https://github.com/wu529778790/wechat-subscription-auth.git
+cd wechat-subscription-auth
+
+# 2. 安装依赖
+pnpm install
+
+# 3. 配置环境变量
+cp .env.example .env
+# 编辑 .env，填入你的配置
+
+# 4. 构建并运行
+pnpm build
+pnpm preview
+
+# 5. 使用 PM2 守护进程（推荐）
+npm install -g pm2
+pm2 start ecosystem.config.js
+```
+
+**PM2 配置文件 `ecosystem.config.js`：**
+```javascript
+module.exports = {
+  apps: [{
+    name: 'wechat-auth',
+    script: '.output/server/index.mjs',
+    env: {
+      NODE_ENV: 'production',
+      SITE_URL: 'https://your-main-site.com',
+      WECHAT_TOKEN: 'your-token',
+      SESSION_SECRET: 'your-secret'
+    }
+  }]
+}
+```
+
+### 场景 3: Docker 部署
 
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 EXPOSE 3000
+ENV NODE_ENV=production
 CMD ["pnpm", "preview"]
 ```
+
+构建并运行：
+```bash
+docker build -t wechat-auth .
+docker run -d -p 3000:3000 \
+  -e SITE_URL=https://your-main-site.com \
+  -e WECHAT_TOKEN=your-token \
+  -e SESSION_SECRET=your-secret \
+  wechat-auth
+```
+
+### 场景 4: 与现有网站集成
+
+如果你的 `your-main-site.com` 已有其他服务，可以：
+
+**方案 A: 作为子路径**
+```
+https://your-main-site.com/auth  # 认证系统
+```
+修改 `nuxt.config.ts`：
+```typescript
+export default defineNuxtConfig({
+  app: {
+    baseURL: '/auth/'
+  }
+})
+```
+
+**方案 B: 作为子域名（推荐）**
+```
+https://your-domain.com  # 认证系统
+https://your-main-site.com  # 主网站
+```
+部署时配置 `SITE_URL=https://your-domain.com`
+
+**方案 C: 嵌入现有网站**
+在你的博客中添加一个页面，嵌入认证系统的 iframe 或跳转。
 
 ## 🔒 安全建议
 
