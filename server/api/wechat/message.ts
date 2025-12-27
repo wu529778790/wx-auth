@@ -115,47 +115,47 @@ export default defineEventHandler(async (event) => {
       // 处理消息逻辑
       let replyMsg = '';
 
-      // 关注事件 - 核心逻辑：自动发送验证码
-      if (MsgType === 'event' && Event === 'subscribe') {
-        const code = generateVerificationCode();
-        saveAuthCode(code, FromUserName);
+      try {
+        // 关注事件 - 核心逻辑：自动发送验证码
+        if (MsgType === 'event' && Event === 'subscribe') {
+          const code = generateVerificationCode();
+          saveAuthCode(code, FromUserName);
 
-        console.log(`[WeChat] 用户 ${FromUserName} 关注公众号，发送验证码 ${code}`);
+          console.log(`[WeChat] 用户 ${FromUserName} 关注公众号，发送验证码 ${code}`);
 
-        const welcomeMsg = generateWelcomeMessage(FromUserName);
-        const codeMsg = `\n\n您的认证码：${code}\n\n请在网站输入此验证码完成认证。`;
+          const welcomeMsg = generateWelcomeMessage(FromUserName);
+          const codeMsg = `\n\n您的认证码：${code}\n\n请在网站输入此验证码完成认证。`;
 
-        replyMsg = welcomeMsg + codeMsg;
+          replyMsg = welcomeMsg + codeMsg;
 
-      } else if (MsgType === 'text') {
-        const content = (Content || '').trim();
+        } else if (MsgType === 'text') {
+          const content = (Content || '').trim();
 
-        // 状态查询
-        if (isStatusKeyword(content)) {
-          replyMsg = generateStatusMessage(FromUserName);
-        }
-        // 帮助信息
-        else if (isHelpKeyword(content)) {
-          replyMsg = generateHelpMessage();
-        }
-        // 认证关键词 - 重新发送验证码
-        else if (containsAuthKeyword(content)) {
-          console.log('[WeChat] 开始处理认证关键词，content:', content);
-          const existingCode = generateVerificationCode();
-          console.log('[WeChat] 生成的验证码:', existingCode);
-          try {
+          // 状态查询
+          if (isStatusKeyword(content)) {
+            replyMsg = generateStatusMessage(FromUserName);
+          }
+          // 帮助信息
+          else if (isHelpKeyword(content)) {
+            replyMsg = generateHelpMessage();
+          }
+          // 认证关键词 - 重新发送验证码
+          else if (containsAuthKeyword(content)) {
+            console.log('[WeChat] 开始处理认证关键词，content:', content);
+            const existingCode = generateVerificationCode();
+            console.log('[WeChat] 生成的验证码:', existingCode);
             saveAuthCode(existingCode, FromUserName);
             console.log(`[WeChat] 用户 ${FromUserName} 请求验证码，重新生成 ${existingCode}`);
             replyMsg = generateCodeMessage(existingCode);
-          } catch (e) {
-            console.error('[WeChat] 保存验证码失败:', e);
-            replyMsg = '系统错误，请稍后重试';
+          }
+          // 默认回复
+          else {
+            replyMsg = '欢迎！如果您需要重新获取验证码，请发送"已关注"或"认证"。';
           }
         }
-        // 默认回复
-        else {
-          replyMsg = '欢迎！如果您需要重新获取验证码，请发送"已关注"或"认证"。';
-        }
+      } catch (error) {
+        console.error('[WeChat] 处理消息逻辑出错:', error);
+        replyMsg = '欢迎！如果您需要重新获取验证码，请发送"已关注"或"认证"。';
       }
 
       // 构建回复消息
