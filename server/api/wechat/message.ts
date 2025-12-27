@@ -15,7 +15,10 @@ import {
   generateStatusMessage
 } from '~/server/utils/wechat';
 import {
-  saveAuthCode
+  saveAuthCode,
+  findTokenByPendingCode,
+  convertPendingToAuthCode,
+  getPendingCode
 } from '~/server/utils/storage';
 
 export default defineEventHandler(async (event) => {
@@ -78,6 +81,38 @@ export default defineEventHandler(async (event) => {
       if (MsgType === 'text') {
         const content = (Content || '').trim();
 
+        // 1. 检查是否是6位数字（认证码）
+        if (/^\d{6}$/.test(content)) {
+          const token = findTokenByPendingCode(content);
+
+          if (token) {
+            // 找到对应的待验证代码，转换为认证码
+            const pendingData = getPendingCode(token);
+            if (pendingData) {
+              // 转换为认证码，保存用户信息
+              convertPendingToAuthCode(token, FromUserName);
+              console.log(`[WeChat] 用户 ${FromUserName} 发送认证码 ${content}，认证成功`);
+
+              return generateWeChatReply({
+                ToUserName: FromUserName,
+                FromUserName: ToUserName,
+                CreateTime: Math.floor(Date.now() / 1000),
+                MsgType: 'text',
+                Content: `✅ 认证成功！请返回网站点击"我已关注"按钮完成登录。`
+              });
+            }
+          }
+
+          // 未找到对应的待验证代码
+          return generateWeChatReply({
+            ToUserName: FromUserName,
+            FromUserName: ToUserName,
+            CreateTime: Math.floor(Date.now() / 1000),
+            MsgType: 'text',
+            Content: `❌ 认证码无效或已过期。请访问网站生成新的认证码。`
+          });
+        }
+
         // 状态查询
         if (isStatusKeyword(content)) {
           return generateWeChatReply({
@@ -100,7 +135,7 @@ export default defineEventHandler(async (event) => {
           });
         }
 
-        // 认证关键词
+        // 认证关键词（兼容旧版，生成认证码）
         if (containsAuthKeyword(content)) {
           const code = generateVerificationCode();
           saveAuthCode(code, FromUserName);
@@ -122,7 +157,7 @@ export default defineEventHandler(async (event) => {
           FromUserName: ToUserName,
           CreateTime: Math.floor(Date.now() / 1000),
           MsgType: 'text',
-          Content: '收到消息！发送"已关注"获取认证码。'
+          Content: '收到消息！请访问网站生成认证码，然后发送6位数字到此公众号完成认证。'
         });
       }
 

@@ -14,7 +14,6 @@ export default defineNuxtConfig({
   // 路由规则
   routeRules: {
     '/': { ssr: true },
-    '/auth': { ssr: true },
     '/admin/**': { ssr: false },
     '/api/wechat/**': {
       ssr: false,
