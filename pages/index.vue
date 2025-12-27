@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
-    <!-- 主要内容区域 - 已认证时显示 -->
+    <!-- 已认证状态 - 显示成功页面 -->
     <div v-if="session?.authenticated" class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 animate-fade-in">
       <div class="text-center mb-6">
         <div class="text-6xl mb-2">🎉</div>
@@ -31,72 +31,23 @@
       </button>
     </div>
 
-    <!-- 未认证时显示的主页内容 -->
-    <div v-else-if="!loading" class="w-full max-w-md text-center animate-fade-in">
-      <!-- 欢迎卡片 -->
-      <div class="bg-white/90 backdrop-blur rounded-2xl shadow-2xl p-8 mb-4">
-        <div class="text-5xl mb-3">🔐</div>
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">微信订阅号认证系统</h1>
-        <p class="text-gray-600 text-sm">为了保护您的隐私，请先完成身份认证</p>
-      </div>
-
-      <!-- 快速开始按钮 -->
-      <button
-        @click="showAuthModal = true"
-        class="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl font-bold text-lg shadow-lg transition transform hover:scale-105"
-      >
-        🔓 立即认证
-      </button>
-
-      <!-- 简洁说明 -->
-      <div class="mt-4 bg-white/80 backdrop-blur rounded-xl p-4 text-sm text-gray-700">
-        <p class="opacity-80">关注公众号 → 获取验证码 → 输入完成认证</p>
-      </div>
-
-      <!-- 开发测试工具（折叠式） -->
-      <div class="mt-4 bg-white/80 backdrop-blur rounded-xl p-3 text-sm text-gray-700 border border-yellow-300">
-        <div class="flex items-center justify-between mb-2 cursor-pointer" @click="showTestTools = !showTestTools">
-          <span class="font-semibold">🛠️ 开发测试</span>
-          <span class="text-xs px-2 py-1 bg-yellow-100 rounded">{{ showTestTools ? '隐藏' : '显示' }}</span>
-        </div>
-
-        <div v-if="showTestTools" class="space-y-2 mt-2">
-          <input
-            v-model="testOpenid"
-            placeholder="测试OpenID"
-            class="w-full px-2 py-1 text-xs border rounded"
-          />
-          <button
-            @click="simulateSubscribe"
-            :disabled="isSimulating"
-            class="w-full py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white rounded font-semibold transition text-xs"
-          >
-            {{ isSimulating ? '模拟中...' : '🎯 模拟关注公众号' }}
-          </button>
-          <div v-if="generatedCode" class="bg-white p-2 rounded border border-yellow-300 text-center">
-            <p class="text-xs text-gray-500">验证码: <span class="text-lg font-bold text-yellow-600">{{ generatedCode }}</span></p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- 加载状态 -->
-    <div v-else class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center">
+    <div v-else-if="loading" class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
       <h2 class="text-xl font-bold text-gray-700">正在检查认证状态...</h2>
     </div>
 
-    <!-- 认证弹窗（模态框） -->
-    <div v-if="showAuthModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" @click.self="closeAuthModal">
-      <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto relative animate-scale-in">
-        <!-- 关闭按钮 -->
-        <button @click="closeAuthModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
+    <!-- 未认证状态 - 强制弹窗认证 -->
+    <div v-else class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-purple-600">
+      <!-- 强制认证弹窗 -->
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 animate-scale-in relative">
+        <!-- 无关闭按钮 - 强制认证 -->
 
         <!-- 弹窗头部 -->
         <div class="text-center mb-4">
-          <div class="text-4xl mb-1">📱</div>
-          <h2 class="text-xl font-bold text-gray-800">完成认证</h2>
-          <p class="text-gray-600 text-sm mt-1">关注公众号，获取验证码</p>
+          <div class="text-5xl mb-2">🔐</div>
+          <h2 class="text-2xl font-bold text-gray-800">完成身份认证</h2>
+          <p class="text-gray-600 text-sm mt-1">关注公众号获取验证码，继续访问</p>
         </div>
 
         <!-- 操作步骤 -->
@@ -160,7 +111,7 @@
           没收到验证码？点击重新获取
         </button>
 
-        <!-- 弹窗内的测试工具 -->
+        <!-- 开发测试工具 -->
         <div class="mt-3 pt-3 border-t border-gray-200">
           <div class="flex items-center justify-between mb-2 cursor-pointer" @click="showTestTools = !showTestTools">
             <span class="text-xs font-semibold text-yellow-700">🛠️ 开发测试工具</span>
@@ -186,6 +137,12 @@
             </div>
           </div>
         </div>
+
+        <!-- 底部说明 -->
+        <div class="mt-3 text-xs text-gray-500 text-center bg-gray-50 rounded p-2">
+          <p>🔒 本系统需要认证后才能访问</p>
+          <p>请先关注公众号完成认证</p>
+        </div>
       </div>
     </div>
   </div>
@@ -197,9 +154,6 @@ const loading = ref(true);
 const verificationCode = ref('');
 const isVerifying = ref(false);
 const message = ref<{ type: string; text: string } | null>(null);
-
-// 弹窗状态
-const showAuthModal = ref(false);
 
 // 测试工具状态
 const showTestTools = ref(false);
@@ -253,14 +207,6 @@ const formatTime = (isoString: string) => {
   });
 };
 
-// 关闭认证弹窗
-const closeAuthModal = () => {
-  showAuthModal.value = false;
-  message.value = null;
-  verificationCode.value = '';
-  generatedCode.value = '';
-};
-
 const logout = async () => {
   if (confirm('确定要退出登录吗？')) {
     await $fetch('/api/auth/session', { method: 'DELETE' });
@@ -300,12 +246,9 @@ const verifyCode = async () => {
         body: { user: result.user }
       });
 
-      // 1秒后关闭弹窗，显示认证成功页面
+      // 1秒后自动刷新页面，显示认证成功页面
       setTimeout(() => {
-        showAuthModal.value = false;
-        message.value = null;
-        verificationCode.value = '';
-        generatedCode.value = '';
+        location.reload();
       }, 1000);
     } else {
       const errorMsg = result.error === 'invalid_or_expired'
@@ -365,11 +308,6 @@ const simulateSubscribe = async () => {
         type: 'success',
         text: `✅ 模拟成功！验证码已生成，可直接验证`
       };
-
-      // 如果弹窗未打开，自动打开
-      if (!showAuthModal.value) {
-        showAuthModal.value = true;
-      }
     } else {
       message.value = { type: 'error', text: `❌ ${result.error}` };
     }

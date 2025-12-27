@@ -1,4 +1,13 @@
 {
-  "authCodes": {},
-  "authenticatedUsers": {}
+  "authCodes": {
+    "260354": {
+      "openid": "oxxx_testuserǿ����֤",
+      "expiredAt": 1766817150391
+    }
+  },
+  "authenticatedUsers": {
+    "oxxx_testuserǿ����֤": {
+      "authenticatedAt": "2025-12-27T06:27:35.707Z"
+    }
+  }
 }
