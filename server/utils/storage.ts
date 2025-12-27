@@ -1,15 +1,8 @@
 // 内存存储 - 极简方案，无需数据库
 // 数据存储在内存中，重启后丢失（适合开发/小型项目）
 
-// 待验证代码存储：sessionToken -> {code, expiredAt}
-// 用于用户访问网站时生成的临时验证码，等待用户关注公众号后发送
-const pendingCodes = new Map<string, {
-  code: string;
-  expiredAt: number;
-}>();
-
-// 认证码存储：code -> {openid, expiredAt, userInfo}
-// 用于公众号回复后，用户通过此码完成认证
+// 验证码存储：code -> {openid, expiredAt, userInfo}
+// 用户关注公众号时生成，用户输入验证码时验证
 const authCodes = new Map<string, {
   openid: string;
   expiredAt: number;
@@ -30,15 +23,7 @@ const authenticatedUsers = new Map<string, {
 setInterval(() => {
   const now = Date.now();
   let cleanedAuth = 0;
-  let cleanedPending = 0;
-
-  // 清理待验证代码
-  for (const [token, data] of pendingCodes) {
-    if (data.expiredAt < now) {
-      pendingCodes.delete(token);
-      cleanedPending++;
-    }
-  }
+  let cleanedUsers = 0;
 
   // 清理认证码
   for (const [code, data] of authCodes) {
@@ -48,13 +33,18 @@ setInterval(() => {
     }
   }
 
-  if (cleanedPending > 0 || cleanedAuth > 0) {
-    console.log(`[Storage] 清理了 ${cleanedPending} 个过期待验证代码, ${cleanedAuth} 个过期认证码`);
+  // 清理已认证用户（可选，如果需要限制登录时间）
+  // for (const [openid, data] of authenticatedUsers) {
+  //   // 可以设置用户认证有效期
+  // }
+
+  if (cleanedAuth > 0 || cleanedUsers > 0) {
+    console.log(`[Storage] 清理了 ${cleanedAuth} 个过期认证码, ${cleanedUsers} 个过期用户`);
   }
 }, 60 * 1000);
 
 /**
- * 保存认证码
+ * 保存认证码（用户关注公众号时调用）
  */
 export function saveAuthCode(
   code: string,
@@ -63,7 +53,7 @@ export function saveAuthCode(
 ) {
   const expiryTime = parseInt(process.env.CODE_EXPIRY || '300') * 1000;
 
-  // 删除该用户之前的认证码
+  // 删除该用户之前的认证码（一个用户只有一个有效验证码）
   for (const [existingCode, data] of authCodes) {
     if (data.openid === openid) {
       authCodes.delete(existingCode);
@@ -154,78 +144,19 @@ export function clearUserAuthentication(openid: string) {
  */
 export function getStorageStats() {
   return {
-    pendingCodes: pendingCodes.size,
     authCodes: authCodes.size,
     authenticatedUsers: authenticatedUsers.size
   };
 }
 
 /**
- * 保存待验证代码（用户访问网站时生成）
+ * 通过openid查找认证码（用于公众号发送消息后，用户输入时）
  */
-export function savePendingCode(token: string, code: string) {
-  const expiryTime = parseInt(process.env.CODE_EXPIRY || '300') * 1000;
-
-  pendingCodes.set(token, {
-    code,
-    expiredAt: Date.now() + expiryTime
-  });
-
-  console.log(`[Storage] 保存待验证代码 ${code} 对应 token ${token}`);
-}
-
-/**
- * 通过token获取待验证代码
- */
-export function getPendingCode(token: string) {
-  const data = pendingCodes.get(token);
-
-  if (!data) return null;
-
-  // 检查是否过期
-  if (data.expiredAt < Date.now()) {
-    pendingCodes.delete(token);
-    return null;
-  }
-
-  return data;
-}
-
-/**
- * 删除待验证代码
- */
-export function deletePendingCode(token: string) {
-  return pendingCodes.delete(token);
-}
-
-/**
- * 通过待验证代码查找token（用于公众号消息处理）
- */
-export function findTokenByPendingCode(code: string): string | null {
-  for (const [token, data] of pendingCodes) {
-    if (data.code === code) {
-      return token;
+export function findAuthCodeByOpenid(openid: string): string | null {
+  for (const [code, data] of authCodes) {
+    if (data.openid === openid) {
+      return code;
     }
   }
   return null;
-}
-
-/**
- * 将待验证代码转换为认证码（用户关注并发送代码后调用）
- */
-export function convertPendingToAuthCode(token: string, openid: string, userInfo?: { nickname?: string; headimgurl?: string; unionid?: string }) {
-  const pendingData = getPendingCode(token);
-
-  if (!pendingData) {
-    return null;
-  }
-
-  // 保存为认证码
-  saveAuthCode(pendingData.code, openid, userInfo);
-
-  // 删除待验证代码
-  deletePendingCode(token);
-
-  console.log(`[Storage] 待验证代码 ${pendingData.code} 已转换为认证码`);
-  return pendingData.code;
 }

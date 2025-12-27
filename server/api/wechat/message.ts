@@ -16,9 +16,9 @@ import {
 } from '~/server/utils/wechat';
 import {
   saveAuthCode,
-  findTokenByPendingCode,
-  convertPendingToAuthCode,
-  getPendingCode
+  getUserByAuthCode,
+  deleteAuthCode,
+  markUserAuthenticated
 } from '~/server/utils/storage';
 
 export default defineEventHandler(async (event) => {
@@ -66,52 +66,32 @@ export default defineEventHandler(async (event) => {
       const message = parseWeChatMessage(body);
       const { MsgType, Event, FromUserName, ToUserName, Content } = message;
 
-      // 关注事件
+      // 关注事件 - 核心逻辑：自动发送验证码
       if (MsgType === 'event' && Event === 'subscribe') {
+        // 生成6位验证码
+        const code = generateVerificationCode();
+
+        // 保存验证码（关联用户openid）
+        saveAuthCode(code, FromUserName);
+
+        console.log(`[WeChat] 用户 ${FromUserName} 关注公众号，发送验证码 ${code}`);
+
+        // 回复欢迎消息 + 验证码
+        const welcomeMsg = generateWelcomeMessage(FromUserName);
+        const codeMsg = `\n\n您的认证码：${code}\n\n请在网站输入此验证码完成认证。`;
+
         return generateWeChatReply({
           ToUserName: FromUserName,
           FromUserName: ToUserName,
           CreateTime: Math.floor(Date.now() / 1000),
           MsgType: 'text',
-          Content: generateWelcomeMessage(FromUserName)
+          Content: welcomeMsg + codeMsg
         });
       }
 
       // 文本消息
       if (MsgType === 'text') {
         const content = (Content || '').trim();
-
-        // 1. 检查是否是6位数字（认证码）
-        if (/^\d{6}$/.test(content)) {
-          const token = findTokenByPendingCode(content);
-
-          if (token) {
-            // 找到对应的待验证代码，转换为认证码
-            const pendingData = getPendingCode(token);
-            if (pendingData) {
-              // 转换为认证码，保存用户信息
-              convertPendingToAuthCode(token, FromUserName);
-              console.log(`[WeChat] 用户 ${FromUserName} 发送认证码 ${content}，认证成功`);
-
-              return generateWeChatReply({
-                ToUserName: FromUserName,
-                FromUserName: ToUserName,
-                CreateTime: Math.floor(Date.now() / 1000),
-                MsgType: 'text',
-                Content: `✅ 认证成功！请返回网站点击"我已关注"按钮完成登录。`
-              });
-            }
-          }
-
-          // 未找到对应的待验证代码
-          return generateWeChatReply({
-            ToUserName: FromUserName,
-            FromUserName: ToUserName,
-            CreateTime: Math.floor(Date.now() / 1000),
-            MsgType: 'text',
-            Content: `❌ 认证码无效或已过期。请访问网站生成新的认证码。`
-          });
-        }
 
         // 状态查询
         if (isStatusKeyword(content)) {
@@ -135,19 +115,19 @@ export default defineEventHandler(async (event) => {
           });
         }
 
-        // 认证关键词（兼容旧版，生成认证码）
+        // 认证关键词 - 重新发送验证码
         if (containsAuthKeyword(content)) {
-          const code = generateVerificationCode();
-          saveAuthCode(code, FromUserName);
+          const existingCode = generateVerificationCode();
+          saveAuthCode(existingCode, FromUserName);
 
-          console.log(`[WeChat] 生成认证码 ${code}`);
+          console.log(`[WeChat] 用户 ${FromUserName} 请求验证码，重新生成 ${existingCode}`);
 
           return generateWeChatReply({
             ToUserName: FromUserName,
             FromUserName: ToUserName,
             CreateTime: Math.floor(Date.now() / 1000),
             MsgType: 'text',
-            Content: generateCodeMessage(code)
+            Content: generateCodeMessage(existingCode)
           });
         }
 
@@ -157,7 +137,7 @@ export default defineEventHandler(async (event) => {
           FromUserName: ToUserName,
           CreateTime: Math.floor(Date.now() / 1000),
           MsgType: 'text',
-          Content: '收到消息！请访问网站生成认证码，然后发送6位数字到此公众号完成认证。'
+          Content: '欢迎！如果您需要重新获取验证码，请发送"已关注"或"认证"。'
         });
       }
 
