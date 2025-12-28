@@ -20,9 +20,8 @@
     <div v-else class="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 animate-fade-in">
 
       <!-- 标题栏 -->
-      <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-xl text-center">
+      <div class="bg-gray-50 px-6 py-3 border-b border-gray-200 rounded-t-xl text-center">
         <h2 class="text-lg font-bold text-gray-800">微信认证</h2>
-        <p class="text-xs text-gray-500 mt-1">请按以下步骤完成认证</p>
       </div>
 
       <!-- 内容区域 -->
@@ -30,7 +29,7 @@
 
         <!-- 二维码 -->
         <div class="text-center">
-          <div class="w-24 h-24 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 border border-gray-200">
+          <div class="w-32 h-32 mx-auto bg-white rounded-lg flex items-center justify-center mb-2 border border-gray-200">
             <img v-if="qrcodeUrl" :src="qrcodeUrl" alt="扫码关注" class="w-full h-full object-contain p-2" />
             <div v-else class="text-gray-400 text-sm">📷<br/>二维码</div>
           </div>
