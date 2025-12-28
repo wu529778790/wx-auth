@@ -1,405 +1,207 @@
-# 微信订阅号认证系统 - Nuxt 4
+# 微信订阅号认证系统
 
-> 🎯 **极简设计，持久化存储，开箱即用**
+> 🎯 **极简设计，开箱即用**
 
-基于 **Nuxt 4** 的微信订阅号认证系统。关注公众号自动发送验证码，用户输入完成认证。
+一个基于 Nuxt 4 的微信订阅号认证系统。用户关注公众号后获取验证码，输入即可完成认证。
 
-## ✨ 核心特性
+---
 
-- ✅ **持久化存储** - 重启不丢失数据
-- ✅ **自动发送验证码** - 关注立即收到
-- ✅ **单页面** - 无需额外页面
-- ✅ **自动清理** - 过期数据自动删除
-
-## 📊 数据存储
-
-### 默认：JSON 文件存储
-```bash
-# 数据自动保存到 data/auth-data.json
-# 无需配置，重启后数据完整保留
-pnpm dev
-```
-
-### 可选：SQLite 数据库
-```bash
-# 1. 编译原生模块
-pnpm rebuild better-sqlite3
-
-# 2. 启用 SQLite
-STORAGE_TYPE=sqlite pnpm dev
-```
-
-**存储说明：**
-- `authCodes` - 临时验证码（5分钟过期）
-- `authenticatedUsers` - 已认证用户（持久保存）
-
-## 📋 工作流程
-
-### 认证服务号（自动模式）
-```
-用户访问网站
-    ↓
-显示引导页（二维码 + 输入框）
-    ↓
-用户扫码关注公众号
-    ↓
-公众号自动发送6位验证码
-    ↓
-用户在网站输入验证码
-    ↓
-验证成功 → 完成登录
-```
-
-### 未认证订阅号（手动模式）
-```
-用户访问网站
-    ↓
-显示引导页（二维码 + 输入框）
-    ↓
-用户扫码关注公众号
-    ↓
-用户在微信发送"1"或"验证码"
-    ↓
-公众号回复6位验证码
-    ↓
-用户在网站输入验证码
-    ↓
-验证成功 → 完成登录
-```
-
-**流程说明：**
-1. 用户访问网站，看到引导页面
-2. 扫码关注公众号
-3. **未认证订阅号**：用户在微信发送关键词获取验证码
-4. **认证服务号**：关注后自动发送验证码
-5. 用户在网站输入 `123456`
-6. 点击"验证"按钮，完成登录
-
-> 💡 **支持的触发关键词**：`1`、`验证码`、`已关注`、`认证`、`验证`、`login`、`已订阅`、`关注了`
-
-## 🚀 快速开始
+## 🚀 3步启动
 
 ### 1. 安装依赖
-
 ```bash
 pnpm install
 ```
 
-### 2. 配置环境变量
-
+### 2. 配置环境
 ```bash
 cp .env.example .env
 ```
 
-编辑 `.env` 文件：
-
+编辑 `.env`：
 ```bash
-# 网站地址（必须）
-SITE_URL=https://your-website.com
-
-# 服务器 Token（必须，与微信后台一致）
-WECHAT_TOKEN=your-wechat-token
-
-# 公众号名称（必须，用于前端显示）
-WECHAT_NAME=我的公众号
-
-# 公众号二维码URL（可选，用于前端显示二维码）
-# 可以是图片URL或Base64，留空则显示默认占位图
-WECHAT_QRCODE_URL=
-
-# Session密钥（必须，生产环境使用随机字符串）
-SESSION_SECRET=openssl rand -hex 32
-
-# 以下可选（未认证订阅号无需填写）
-WECHAT_APPID=
-WECHAT_APPSECRET=
+SITE_URL=https://your-site.com          # 你的网站地址
+WECHAT_TOKEN=your-token                 # 微信后台Token
+WECHAT_NAME=我的公众号                  # 公众号名称
+WECHAT_QRCODE_URL=                      # 二维码图片URL（可选）
+SESSION_SECRET=random-string            # 随机密钥
 ```
 
-### 3. 启动开发服务器
-
+### 3. 启动服务
 ```bash
 pnpm dev
 ```
 
-访问 http://localhost:3000
+访问：http://localhost:3000
 
-### 4. 配置微信公众号后台
+---
 
-登录微信公众号平台 → 开发 → 基本配置：
+## 📋 工作流程
+
+```
+用户访问网站
+    ↓
+看到二维码 + 输入框
+    ↓
+微信扫码关注公众号
+    ↓
+公众号发送"验证码"获取
+    ↓
+输入6位数字 → 点击验证
+    ↓
+✅ 认证成功
+```
+
+---
+
+## ⚙️ 微信后台配置
+
+登录公众号平台 → 开发 → 基本配置：
 
 | 配置项 | 值 |
 |--------|-----|
-| **服务器URL** | `https://your-domain.com/api/wechat/message` |
+| **服务器URL** | `https://your-site.com/api/wechat/message` |
 | **Token** | 与 `.env` 中的 `WECHAT_TOKEN` 一致 |
-| **EncodingAESKey** | 随机生成或留空 |
-| **消息加解密方式** | **明文模式**（推荐，简单稳定） |
+| **消息模式** | **明文模式** |
 
-### 5. 测试完整流程
+---
 
-1. **访问网站** → 看到引导页面
-2. **扫码关注** 你的公众号
-3. **收到消息**：公众号自动发送验证码（如：`您的认证码：123456`）
-4. **输入验证码**：在网站输入 `123456`
-5. **点击验证**：完成登录
-
-## 🏗️ 项目架构
-
-### 目录结构
+## 📁 项目结构
 
 ```
-wechat-subscription-auth/
-├── server/                      # 服务端代码
-│   ├── api/                     # API 路由
-│   │   ├── wechat/
-│   │   │   └── message.ts      # 微信消息处理（关注时发验证码）
-│   │   └── auth/
-│   │       ├── check.ts        # 验证码检查
-│   │       └── session.ts      # Session 管理
-│   └── utils/                   # 工具函数
-│       ├── storage.ts          # 持久化存储（JSON/SQLite）
-│       ├── db.ts               # SQLite 数据库管理
-│       ├── wechat.ts           # 微信工具
-│       └── session.ts          # Session 工具
-├── data/                       # 数据目录（自动生成）
-│   └── auth-data.json         # 存储文件
-├── pages/                       # 前端页面
-│   └── index.vue               # 单页认证（输入验证码）
-├── app.vue                     # 根组件
-├── nuxt.config.ts              # Nuxt 配置
-└── package.json                # 依赖
+├── server/api/wechat/message.ts    # 微信消息处理（关注发验证码）
+├── server/api/auth/check.ts        # 验证码验证
+├── pages/index.vue                 # 前端界面（极简）
+├── data/auth-data.json             # 数据存储（自动生成）
+└── .env                            # 环境变量（需自己创建）
 ```
 
-### 核心逻辑
+---
 
-#### 1. 微信消息处理 (`server/api/wechat/message.ts`)
+## 🔧 核心功能
+
+### 1. 关注自动回复
 ```typescript
-// 用户关注公众号时
-if (MsgType === 'event' && Event === 'subscribe') {
-  // 生成6位验证码
-  const code = generateVerificationCode();
-
-  // 保存验证码
-  saveAuthCode(code, FromUserName);
-
-  // 自动回复验证码
-  return reply(`您的认证码：${code}`);
-}
+// server/api/wechat/message.ts
+用户关注 → 生成6位验证码 → 保存 → 自动回复
 ```
 
-#### 2. 前端验证 (`pages/index.vue`)
+### 2. 验证码验证
 ```typescript
-// 用户输入验证码
-const verifyCode = async () => {
-  const result = await $fetch('/api/auth/check', {
-    query: { authToken: verificationCode.value }
-  });
-
-  if (result.authenticated) {
-    // 登录成功
-    session.value = result;
-    // 保存cookie
-    document.cookie = `wxauth-openid=${result.user.openid}; ...`;
-  }
-};
+// pages/index.vue
+输入验证码 → 调用 /api/auth/check → 认证成功
 ```
 
-## 🔧 技术栈
+### 3. 持久化存储
+- **验证码**：5分钟过期
+- **已认证用户**：永久保存（Cookie + 存储）
 
-| 技术 | 版本 | 用途 |
-|------|------|------|
-| **Nuxt** | 4.0+ | 服务端渲染框架 |
-| **H3** | 1.13+ | HTTP 服务器 |
-| **fast-xml-parser** | 4.4+ | XML 消息解析 |
-| **Tailwind CSS** | 3.4+ | 样式框架 |
-| **TypeScript** | 5.2+ | 类型安全 |
+---
 
-## 🎨 UI 特性
+## 🎨 界面预览
 
-### 主页 (`pages/index.vue`)
-- ✅ 清晰的3步操作指引
-- ✅ 大号验证码输入框
-- ✅ 实时状态提示（成功/错误/等待）
-- ✅ 验证按钮（带禁用状态）
-- ✅ 重新获取验证码提示
-- ✅ 响应式设计
+```
+┌─────────────────────────────┐
+│        📷 二维码             │
+│    微信扫码关注 "我的公众号"  │
+│                             │
+│  ┌─────────┐ ┌──────────┐  │
+│  │验证码   │ │   验证   │  │
+│  └─────────┘ └──────────┘  │
+│                             │
+│  在公众号发送"验证码"获取    │
+└─────────────────────────────┘
+```
 
-## 🚀 部署指南
+---
 
-### 场景 1: 部署到 Vercel（推荐 - 免费）
+## 🚀 部署
 
+### Vercel（推荐）
 ```bash
-# 1. 安装 Vercel CLI
-npm i -g vercel
-
-# 2. 部署
 pnpm build
 vercel --prod
 ```
 
-**Vercel 环境变量配置：**
-登录 Vercel 控制台 → 选择项目 → Settings → Environment Variables
-
-| 变量名 | 值 | 说明 |
-|--------|-----|------|
-| `SITE_URL` | `https://your-main-site.com` | 你的域名 |
-| `WECHAT_TOKEN` | `你的Token` | 与微信后台一致 |
-| `SESSION_SECRET` | `openssl rand -hex 32` 生成的随机值 | 加密密钥 |
-
-### 场景 2: 部署到自有服务器（VPS/云服务器）
-
+### 服务器
 ```bash
-# 1. 克隆代码
-git clone https://github.com/wu529778790/wechat-subscription-auth.git
-cd wechat-subscription-auth
-
-# 2. 安装依赖
-pnpm install
-
-# 3. 配置环境变量
-cp .env.example .env
-# 编辑 .env，填入你的配置
-
-# 4. 构建并运行
 pnpm build
 pnpm preview
-
-# 5. 使用 PM2 守护进程（推荐）
-npm install -g pm2
-pm2 start ecosystem.config.js
 ```
 
-**PM2 配置文件 `ecosystem.config.js`：**
-```javascript
-module.exports = {
-  apps: [{
-    name: 'wechat-auth',
-    script: '.output/server/index.mjs',
-    env: {
-      NODE_ENV: 'production',
-      SITE_URL: 'https://your-main-site.com',
-      WECHAT_TOKEN: 'your-token',
-      SESSION_SECRET: 'your-secret'
-    }
-  }]
-}
-```
-
-### 场景 3: Docker 部署
-
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
-COPY . .
-RUN pnpm build
-EXPOSE 3000
-ENV NODE_ENV=production
-CMD ["pnpm", "preview"]
-```
-
-构建并运行：
+### Docker
 ```bash
 docker build -t wechat-auth .
 docker run -d -p 3000:3000 \
-  -e SITE_URL=https://your-main-site.com \
+  -e SITE_URL=https://your-site.com \
   -e WECHAT_TOKEN=your-token \
-  -e SESSION_SECRET=your-secret \
   wechat-auth
 ```
 
-### 场景 4: 与现有网站集成
+---
 
-如果你的 `your-main-site.com` 已有其他服务，可以：
+## 📝 环境变量说明
 
-**方案 A: 作为子路径**
-```
-https://your-main-site.com/auth  # 认证系统
-```
-修改 `nuxt.config.ts`：
-```typescript
-export default defineNuxtConfig({
-  app: {
-    baseURL: '/auth/'
-  }
-})
-```
+| 变量名 | 必填 | 说明 |
+|--------|------|------|
+| `SITE_URL` | ✅ | 网站地址，用于微信回调 |
+| `WECHAT_TOKEN` | ✅ | 微信后台配置的Token |
+| `WECHAT_NAME` | ✅ | 公众号名称（前端显示） |
+| `WECHAT_QRCODE_URL` | ❌ | 二维码图片URL |
+| `SESSION_SECRET` | ✅ | 随机字符串，用于加密 |
+| `WECHAT_APPID` | ❌ | 认证服务号才需要 |
+| `WECHAT_APPSECRET` | ❌ | 认证服务号才需要 |
 
-**方案 B: 作为子域名（推荐）**
-```
-https://your-domain.com  # 认证系统
-https://your-main-site.com  # 主网站
-```
-部署时配置 `SITE_URL=https://your-domain.com`
+---
 
-**方案 C: 嵌入现有网站**
-在你的博客中添加一个页面，嵌入认证系统的 iframe 或跳转。
+## 💡 使用提示
+
+### 未认证订阅号（手动模式）
+用户关注后，在微信发送任意消息（如"1"或"验证码"），公众号会回复6位验证码。
+
+### 认证服务号（自动模式）
+用户关注后，公众号自动发送验证码（需要配置服务器）。
+
+### 支持的触发关键词
+`1`、`验证码`、`已关注`、`认证`、`验证`、`login`、`已订阅`、`关注了`
+
+---
 
 ## 🔒 安全建议
 
-1. **使用强随机 Session 密钥**
-   ```bash
-   openssl rand -hex 32
-   ```
+1. **使用 HTTPS**（微信强制要求）
+2. **设置强随机 Session 密钥**：`openssl rand -hex 32`
+3. **保护 `.env` 文件**，不要提交到 Git
+4. **验证码 5 分钟过期**，自动清理
 
-2. **启用 HTTPS**（微信强制要求）
-
-3. **保护敏感信息**
-   - 不要提交 `.env` 文件
-   - `WECHAT_TOKEN` 保密
-
-4. **验证码有效期**
-   - 默认5分钟，可调整
-   - 自动清理过期数据
+---
 
 ## 🐛 常见问题
 
-| 问题 | 原因 | 解决方案 |
-|------|------|----------|
-| 消息未回复 | 服务器URL不可访问 | 检查HTTPS、域名解析、防火墙 |
-| 验证码无效 | Token过期 | 延长有效期或重新获取 |
-| 验证失败 | Cookie问题 | 检查浏览器Cookie设置 |
-| 部署失败 | 依赖问题 | 删除node_modules重新安装 |
+**Q: 消息没有回复？**
+- 检查服务器URL是否可访问
+- 确认 HTTPS 配置正确
+- 检查 Token 是否一致
 
-## 📊 性能优化
+**Q: 验证失败？**
+- 检查浏览器 Cookie 是否启用
+- 确认验证码未过期（5分钟）
 
-- ✅ **轻量级**：文件存储，无需数据库
-- ✅ **快速响应**：内存缓存 + 持久化
-- ✅ **低资源消耗**：适合小型项目
-- ✅ **自动清理**：避免数据膨胀
+**Q: 如何切换存储方式？**
+- 默认：JSON 文件（无需配置）
+- SQLite：`STORAGE_TYPE=sqlite pnpm dev`
 
-## 🎯 与旧版对比
-
-| 特性 | 旧版 (自动轮询) | 新版 (正确流程) |
-|------|----------------|----------------|
-| **流程** | 访问→轮询→自动登录 | 访问→关注→收验证码→输入→登录 |
-| **用户体验** | 需要等待 | 主动输入，更直观 |
-| **服务器压力** | 每3秒轮询 | 只在验证时请求 |
-| **代码复杂度** | 需要auth.vue | 单页完成 |
-| **适合订阅号** | ❌ 需要AppSecret | ✅ 只需Token |
+---
 
 ## 📄 许可证
 
-MIT License - 你可以自由使用、修改和分发此代码。
-
-## 💬 问题反馈
-
-如有问题或建议：
-1. 检查环境变量配置
-2. 查看控制台日志
-3. 确认微信公众号后台配置
-4. 查看 Nuxt 官方文档
+MIT License - 自由使用
 
 ---
 
 **立即开始：**
-
 ```bash
 pnpm install
 cp .env.example .env
 pnpm dev
 ```
-
-祝你使用愉快！🎉
-
-![qrcode_for_gh_61da24be23ff_258](https://gcore.jsdelivr.net/gh/wu529778790/image/blog/qrcode_for_gh_61da24be23ff_258.jpg)
