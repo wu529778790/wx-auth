@@ -20,7 +20,7 @@
     <div v-else class="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 animate-fade-in">
 
       <!-- 标题栏 -->
-      <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-xl">
+      <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-xl text-center">
         <h2 class="text-lg font-bold text-gray-800">微信认证</h2>
         <p class="text-xs text-gray-500 mt-1">请按以下步骤完成认证</p>
       </div>
@@ -63,12 +63,12 @@
               placeholder="输入6位验证码"
               maxlength="6"
               @keyup.enter="verifyCode"
-              class="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-lg text-center text-lg font-mono focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition"
+              class="flex-1 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-center text-base font-mono focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition"
             />
             <button
               @click="verifyCode"
               :disabled="isVerifying || !verificationCode"
-              class="px-5 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition shadow-sm"
+              class="px-5 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition shadow-sm"
             >
               {{ isVerifying ? '验证中' : '验证' }}
             </button>
