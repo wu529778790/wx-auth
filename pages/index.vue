@@ -134,6 +134,13 @@ const handleInput = (e: Event, index: number) => {
 
   // 更新完整验证码
   verificationCode.value = codeInputs.value.join('');
+
+  // 如果输入了最后一个数字且验证码完整，自动验证
+  if (index === 5 && value && isCodeComplete.value) {
+    setTimeout(() => {
+      verifyCode();
+    }, 300); // 延迟300ms，给用户一个短暂的确认时间
+  }
 };
 
 // 处理键盘事件
@@ -176,6 +183,13 @@ const handlePaste = (e: ClipboardEvent) => {
     setTimeout(() => {
       inputRefs.value[lastIndex]?.focus();
     }, 10);
+
+    // 如果粘贴的内容正好是6位数字，自动验证
+    if (chars.length === 6) {
+      setTimeout(() => {
+        verifyCode();
+      }, 500); // 延迟500ms，给用户一个确认时间
+    }
   }
 };
 
@@ -184,6 +198,17 @@ watch(verificationCode, (newVal) => {
   if (newVal.length === 6) {
     const chars = newVal.split('');
     codeInputs.value = [...chars, ...Array(6 - chars.length).fill('')];
+  }
+});
+
+// 监听session变化，当退出登录时自动聚焦
+watch(session, (newSession) => {
+  if (!newSession?.authenticated) {
+    setTimeout(() => {
+      if (inputRefs.value[0]) {
+        inputRefs.value[0].focus();
+      }
+    }, 100);
   }
 });
 
@@ -209,6 +234,12 @@ onMounted(async () => {
     console.error('Init error:', error);
   } finally {
     loading.value = false;
+    // 页面加载完成后，自动聚焦到第一个输入框
+    setTimeout(() => {
+      if (!session.value?.authenticated && inputRefs.value[0]) {
+        inputRefs.value[0].focus();
+      }
+    }, 100);
   }
 });
 
@@ -250,7 +281,11 @@ const verifyCode = async () => {
       codeInputs.value = ['', '', '', '', '', ''];
       verificationCode.value = '';
       // 聚焦到第一个输入框
-      setTimeout(() => inputRefs.value[0]?.focus(), 100);
+      setTimeout(() => {
+        if (inputRefs.value[0]) {
+          inputRefs.value[0].focus();
+        }
+      }, 100);
     }
   } catch (error) {
     message.value = { type: 'error', text: '验证失败，请重试' };
