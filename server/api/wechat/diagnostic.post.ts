@@ -3,9 +3,9 @@
  * 用于调试微信消息推送问题
  */
 
-import { defineEventHandler, readBody, getQuery } from 'h3';
+import { eventHandler, readBody, getQuery } from 'h3';
 
-export default defineEventHandler(async (event) => {
+export default eventHandler(async (event) => {
   const body = await readBody(event);
   const query = getQuery(event);
 

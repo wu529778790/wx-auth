@@ -1,7 +1,53 @@
 // Session 管理工具函数（使用加密 Cookie）
-import { createError, getCookie, setCookie, deleteCookie } from 'h3';
+import { getCookie, setCookie, deleteCookie } from 'h3';
 import type { H3Event } from 'h3';
 import crypto from 'crypto';
+
+// 兼容性处理：Nuxt 4 可能使用不同版本的 h3
+function safeGetCookie(event: H3Event, name: string): string | undefined {
+  try {
+    // 尝试 h3 2.x 的方式
+    return getCookie(event, name);
+  } catch (error) {
+    // 如果失败，尝试从 event.headers 获取
+    const headers = event.node?.req?.headers || event.headers;
+    if (headers && typeof headers.get === 'function') {
+      const cookieHeader = headers.get('cookie');
+      if (cookieHeader) {
+        const cookies = cookieHeader.split(';').map(c => c.trim());
+        for (const cookie of cookies) {
+          const [key, value] = cookie.split('=');
+          if (key === name) return value;
+        }
+      }
+    }
+    return undefined;
+  }
+}
+
+function safeSetCookie(event: H3Event, name: string, value: string, options: any): void {
+  try {
+    setCookie(event, name, value, options);
+  } catch (error) {
+    // 兼容性处理
+    const headers = event.node?.res?.getHeader?.('set-cookie') || [];
+    const cookie = `${name}=${value}; Path=${options.path || '/'}; Max-Age=${options.maxAge}; ${options.httpOnly ? 'HttpOnly;' : ''} ${options.secure ? 'Secure;' : ''} SameSite=${options.sameSite}`;
+    if (event.node?.res?.setHeader) {
+      event.node.res.setHeader('set-cookie', [...(Array.isArray(headers) ? headers : [headers]), cookie]);
+    }
+  }
+}
+
+function safeDeleteCookie(event: H3Event, name: string, options: any): void {
+  try {
+    deleteCookie(event, name, options);
+  } catch (error) {
+    // 兼容性处理
+    if (event.node?.res?.setHeader) {
+      event.node.res.setHeader('set-cookie', `${name}=; Path=${options.path || '/'}; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+    }
+  }
+}
 
 export interface SessionData {
   authenticated?: boolean;
@@ -85,7 +131,7 @@ export async function createSession(event: H3Event, config?: Partial<SessionConf
   const cookieName = cfg.name;
 
   // 获取现有 session ID
-  let sessionId = getCookie(event, cookieName);
+  let sessionId = safeGetCookie(event, cookieName);
   let sessionData: SessionData = {};
 
   // 如果有 session ID，尝试解密并解析数据
@@ -107,7 +153,7 @@ export async function createSession(event: H3Event, config?: Partial<SessionConf
       sessionData = { ...sessionData, ...data };
       const encrypted = encryptSession(JSON.stringify(sessionData), cfg.secret);
 
-      setCookie(event, cookieName, encrypted, {
+      safeSetCookie(event, cookieName, encrypted, {
         maxAge: cfg.cookie.maxAge,
         sameSite: cfg.cookie.sameSite,
         secure: cfg.cookie.secure,
@@ -118,7 +164,7 @@ export async function createSession(event: H3Event, config?: Partial<SessionConf
 
     // 清除 session
     async clear() {
-      deleteCookie(event, cookieName, { path: '/' });
+      safeDeleteCookie(event, cookieName, { path: '/' });
       sessionData = {};
     },
 

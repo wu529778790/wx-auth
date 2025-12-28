@@ -1,5 +1,7 @@
 // 调试接口 - 查看消息解析详情
-export default defineEventHandler(async (event) => {
+import { eventHandler, readBody } from 'h3';
+
+export default eventHandler(async (event) => {
   const body = await readBody(event);
   const config = useRuntimeConfig().wechat;
 

@@ -1,4 +1,5 @@
 // 测试 API 端点 - 用于验证持久化存储
+import { eventHandler, getMethod } from 'h3';
 import {
   saveAuthCode,
   getUserByAuthCode,
@@ -11,7 +12,7 @@ import {
   deleteAuthCode
 } from '~/server/utils/storage';
 
-export default defineEventHandler(async (event) => {
+export default eventHandler(async (event) => {
   const method = getMethod(event);
 
   if (method !== 'GET' && method !== 'POST') {

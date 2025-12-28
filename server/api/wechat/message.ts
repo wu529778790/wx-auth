@@ -1,6 +1,7 @@
 // 微信消息处理 API - 支持安全模式（加密消息）
 // 路由: /api/wechat/message
 
+import { eventHandler, getMethod, getQuery, readBody } from 'h3';
 import {
   validateWeChatSignature,
   parseWeChatMessage,
@@ -25,7 +26,7 @@ import {
   markUserAuthenticated
 } from '../../utils/storage';
 
-export default defineEventHandler(async (event) => {
+export default eventHandler(async (event) => {
   const method = getMethod(event);
   const config = useRuntimeConfig().wechat;
 

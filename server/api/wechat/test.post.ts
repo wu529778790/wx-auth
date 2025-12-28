@@ -2,10 +2,11 @@
 // 访问方式：POST https://auth.shenzjd.com/api/wechat/test
 // Body: 任意XML内容
 
+import { eventHandler, readBody } from 'h3';
 import { parseWeChatMessage } from '../../utils/wechat';
 import { saveAuthCode } from '../../utils/storage';
 
-export default defineEventHandler(async (event) => {
+export default eventHandler(async (event) => {
   const config = useRuntimeConfig().wechat;
 
   console.log('=== 微信消息测试接口 ===');

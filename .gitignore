@@ -1,45 +1,49 @@
-# Dependencies
-node_modules
-
-# Build output
+# Nuxt
 .nuxt
-.nuxt-dist
+.nuxt/
 .output
-dist
-.build
+.output/
+node_modules
+.claude/
 
-# Environment variables
+# Env
 .env
 .env.local
 .env.*.local
 
-# Database
-*.db
-*.db-journal
-prisma/migrations
-data/
-
-# OS files
+# OS
 .DS_Store
 Thumbs.db
-*.log
 
 # IDE
-.vscode
-.idea
+.vscode/
+.idea/
 *.swp
 *.swo
-*~
-
-# Temporary files
-.tmp
-.cache
 
 # Logs
-logs
 *.log
+logs/
 npm-debug.log*
 
-# Docker
-docker-compose.override.yml
-.claude/
+# Runtime
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage
+.nyc_output
+
+# Build
+dist
+build
+
+# TypeScript
+*.tsbuildinfo
+
+# Lock files
+package-lock.json
+yarn.lock
+*.lock

@@ -1,6 +1,7 @@
 // 开发测试接口 - 模拟关注公众号
 // 路由: /api/test/simulate-subscribe
 
+import { eventHandler, getMethod, readBody } from 'h3';
 import {
   generateVerificationCode,
   generateWelcomeMessage
@@ -9,7 +10,7 @@ import {
   saveAuthCode
 } from '~/server/utils/storage';
 
-export default defineEventHandler(async (event) => {
+export default eventHandler(async (event) => {
   const method = getMethod(event);
 
   if (method !== 'POST') {

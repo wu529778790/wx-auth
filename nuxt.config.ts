@@ -6,10 +6,11 @@ export default defineNuxtConfig({
   // 开发工具
   devtools: { enabled: false },
 
+  // CSS
+  css: ['~/assets/css/main.css'],
+
   // 模块
-  modules: [
-    '@nuxtjs/tailwindcss'
-  ],
+  modules: ['@nuxtjs/tailwindcss'],
 
   // 路由规则
   routeRules: {
@@ -74,24 +75,6 @@ export default defineNuxtConfig({
     },
     // 预设（自动检测）
     preset: undefined
-  },
-
-  // Tailwind CSS 配置
-  tailwindcss: {
-    config: {
-      theme: {
-        extend: {
-          colors: {
-            primary: {
-              50: '#f0fdf4',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d'
-            }
-          }
-        }
-      }
-    }
   },
 
   // TypeScript 配置

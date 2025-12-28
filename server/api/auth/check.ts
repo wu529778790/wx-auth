@@ -1,6 +1,7 @@
 // 认证状态检查 API - 极简版
 // 路由: /api/auth/check
 
+import { eventHandler, getQuery } from 'h3';
 import {
   getUserByAuthCode,
   deleteAuthCode,
@@ -9,7 +10,7 @@ import {
   markUserAuthenticated
 } from '~/server/utils/storage';
 
-export default defineEventHandler(async (event) => {
+export default eventHandler(async (event) => {
   const { authToken, openid } = getQuery(event);
 
   // 1. 检查 openid（已认证过的用户）

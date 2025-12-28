@@ -2,8 +2,9 @@
 // 路由: /api/auth/session
 
 import { createSession } from '~/server/utils/session';
+import { eventHandler, getMethod, readBody, createError } from 'h3';
 
-export default defineEventHandler(async (event) => {
+export default eventHandler(async (event) => {
   const method = getMethod(event);
 
   // 设置 Session
