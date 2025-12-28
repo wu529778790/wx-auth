@@ -35,22 +35,22 @@
             <div v-else class="text-gray-400 text-sm">📷<br/>二维码</div>
           </div>
           <p class="text-sm text-gray-600">
-            微信扫码关注 <span class="font-mono text-blue-600 font-semibold">"{{ wechatName }}"</span>
+            微信扫码关注 <span class="font-mono text-green-600 font-semibold">"{{ wechatName }}"</span>
           </p>
         </div>
 
         <!-- 步骤说明 - 简化版 -->
         <div class="bg-gray-50 rounded-lg p-3 space-y-2">
           <div class="flex items-start gap-2 text-sm">
-            <span class="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">1</span>
+            <span class="w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">1</span>
             <span class="text-gray-700">扫码关注公众号</span>
           </div>
           <div class="flex items-start gap-2 text-sm">
-            <span class="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">2</span>
+            <span class="w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">2</span>
             <span class="text-gray-700">发送"验证码"获取数字</span>
           </div>
           <div class="flex items-start gap-2 text-sm">
-            <span class="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">3</span>
+            <span class="w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xs mt-0.5">3</span>
             <span class="text-gray-700">输入完成认证</span>
           </div>
         </div>
@@ -63,12 +63,12 @@
               placeholder="输入6位验证码"
               maxlength="6"
               @keyup.enter="verifyCode"
-              class="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-lg text-center text-lg font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+              class="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-lg text-center text-lg font-mono focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition"
             />
             <button
               @click="verifyCode"
               :disabled="isVerifying || !verificationCode"
-              class="px-5 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition shadow-sm"
+              class="px-5 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition shadow-sm"
             >
               {{ isVerifying ? '验证中' : '验证' }}
             </button>
@@ -79,7 +79,7 @@
             'p-2 rounded-lg text-sm text-center border',
             message.type === 'success' ? 'bg-green-50 text-green-700 border-green-200' :
             message.type === 'error' ? 'bg-red-50 text-red-700 border-red-200' :
-            'bg-blue-50 text-blue-700 border-blue-200'
+            'bg-green-50 text-green-700 border-green-200'
           ]">
             {{ message.text }}
           </div>
