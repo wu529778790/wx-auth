@@ -308,6 +308,8 @@ export const WxAuth = {
   async autoCheck(): Promise<boolean> {
     const openid = utils.getCookie("wxauth-openid");
     if (!openid) {
+      // 没有 Cookie，显示弹窗
+      this.showAuthModal();
       return false;
     }
 
@@ -321,14 +323,39 @@ export const WxAuth = {
         this.onVerified(result.user);
         return true;
       } else {
-        // Cookie 无效，删除它
+        // Cookie 无效，删除它并显示弹窗
         utils.deleteCookie("wxauth-openid");
+        this.showAuthModal();
         return false;
       }
     } catch (error) {
       console.error("[WxAuth] 自动验证失败:", error);
+      // 请求失败，显示弹窗
+      this.showAuthModal();
       return false;
     }
+  },
+
+  // 显示认证弹窗（内部使用）
+  showAuthModal(): void {
+    UI.show();
+
+    // 显示配置的二维码和描述
+    if (config.qrcodeUrl) {
+      UI.setQrCode(config.qrcodeUrl);
+    }
+
+    // 更新描述文字
+    const desc = document.querySelector<HTMLElement>(".wx-auth-desc");
+    if (desc && config.wechatName) {
+      desc.textContent = `1. 微信关注公众号 "${config.wechatName}"`;
+    }
+
+    // 自动聚焦到第一个输入框
+    setTimeout(() => {
+      const firstInput = document.querySelector<HTMLInputElement>(".wx-auth-input");
+      if (firstInput) firstInput.focus();
+    }, 100);
   },
 
   // 主入口：需要验证时调用
