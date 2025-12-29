@@ -109,7 +109,7 @@ const utils = {
   generateCodeInputs(): string {
     let html = '<div class="wx-auth-inputs">';
     for (let i = 0; i < 6; i++) {
-      html += `<input type="text" maxlength="1" class="wx-auth-input" data-index="${i}" />`;
+      html += `<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="wx-auth-input" data-index="${i}" autocomplete="off" />`;
     }
     html += "</div>";
     return html;
