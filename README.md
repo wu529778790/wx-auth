@@ -28,22 +28,36 @@ await WxAuth.requireAuth();
 ```
 
 **特点**：
-- 📦 总计 < 12KB（JS 8KB + CSS 4KB）
+- 📦 总计 < 12KB（JS 7.4KB + CSS 3.5KB）
 - ⚡ 仅需配置 `apiBase` 参数
 - 🔧 无需后端任何改动
 - 🎨 微信原生风格弹窗
+- 📦 支持 NPM / CDN / 浏览器直接引入
 
-**快速开始**：
+**使用方式**：
+
+1. **NPM 安装（推荐）**：
 ```bash
-# 下载 SDK 文件
-sdk/wx-auth-simple.js
-sdk/wx-auth-simple.css
-
-# 查看文档
-sdk/QUICKSTART-SIMPLE.md
+npm install @wu529778790/wechat-auth-sdk
 ```
 
-**在线演示**：访问 `http://localhost:3000/sdk/demo-simple.html`
+```javascript
+import WxAuth from '@wu529778790/wechat-auth-sdk';
+import '@wu529778790/wechat-auth-sdk/dist/index.css';
+
+WxAuth.init({ apiBase: 'https://your-api.com' });
+await WxAuth.requireAuth();
+```
+
+2. **CDN 引入**：
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@wu529778790/wechat-auth-sdk@1.0.0/dist/index.css">
+<script src="https://cdn.jsdelivr.net/npm/@wu529778790/wechat-auth-sdk@1.0.0/dist/index.js"></script>
+```
+
+**在线演示**：访问 `http://localhost:3000/sdk/demo`
+
+**独立 SDK 仓库**：[wu529778790/wechat-auth-sdk](https://github.com/wu529778790/wechat-auth-sdk)
 
 ---
 
@@ -150,18 +164,20 @@ wechat-subscription-auth/
 │       ├── storage.ts          # 存储层
 │       └── session.ts          # Session 工具
 ├── pages/
-│   └── index.vue               # 认证页面
-├── sdk/                        # 极简 SDK（新增）
-│   ├── wx-auth-simple.js       # SDK 核心 (~8KB)
-│   ├── wx-auth-simple.css      # SDK 样式 (~4KB)
-│   ├── demo-simple.html        # 演示页面
-│   └── QUICKSTART-SIMPLE.md    # SDK 文档
+│   ├── index.vue               # 认证页面
+│   └── sdk/
+│       └── demo.vue            # SDK 演示页面（访问 /sdk/demo）
+├── sdk/                        # SDK 说明文档
+│   ├── README.md               # SDK 使用说明
+│   └── QUICKSTART-SIMPLE.md    # 快速开始指南
 ├── data/
 │   └── auth-data.json          # 数据存储
 ├── nuxt.config.ts
 ├── package.json
 └── .env                        # 环境变量
 ```
+
+**SDK 独立仓库**：`@wu529778790/wechat-auth-sdk` - [GitHub](https://github.com/wu529778790/wechat-auth-sdk) | [NPM](https://www.npmjs.com/package/@wu529778790/wechat-auth-sdk)
 
 ---
 
@@ -406,19 +422,34 @@ WECHAT_ACCOUNTS=[{"name":"公众号A","token":"token1"},{"name":"公众号B","to
 **A**: 修改 `pages/index.vue` 和 `assets/css/main.css`
 
 ### Q: 如何在其他网站中使用？
-**A**: 使用极简 SDK：
+**A**: 使用极简 SDK（推荐 NPM 方式）：
+
+**方式 1: NPM 安装（推荐）**
+```bash
+npm install @wu529778790/wechat-auth-sdk
+```
+
 ```javascript
-// 引入 SDK
-<link rel="stylesheet" href="sdk/wx-auth-simple.css">
-<script src="sdk/wx-auth-simple.js"></script>
+import WxAuth from '@wu529778790/wechat-auth-sdk';
+import '@wu529778790/wechat-auth-sdk/dist/index.css';
 
-// 初始化
 WxAuth.init({ apiBase: 'https://your-api.com' });
-
-// 使用
 await WxAuth.requireAuth();
 ```
-详细文档：`sdk/QUICKSTART-SIMPLE.md`
+
+**方式 2: CDN 引入**
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@wu529778790/wechat-auth-sdk@1.0.0/dist/index.css">
+<script src="https://cdn.jsdelivr.net/npm/@wu529778790/wechat-auth-sdk@1.0.0/dist/index.js"></script>
+
+<script>
+  WxAuth.init({ apiBase: 'https://your-api.com' });
+  await WxAuth.requireAuth();
+</script>
+```
+
+**在线演示**：访问 `http://localhost:3000/sdk/demo`
+**详细文档**：[wu529778790/wechat-auth-sdk](https://github.com/wu529778790/wechat-auth-sdk)
 
 ---
 
@@ -432,10 +463,12 @@ await WxAuth.requireAuth();
 - **存储**: JSON 文件 / SQLite
 - **加密**: AES-256-GCM / AES-256-CBC / SHA1
 
-**极简 SDK**：
-- **文件大小**: < 12KB (JS 8KB + CSS 4KB)
+**极简 SDK**（独立包 `@wu529778790/wechat-auth-sdk`）：
+- **文件大小**: < 12KB (JS 7.4KB + CSS 3.5KB)
 - **依赖**: 零依赖（原生 JS）
 - **兼容性**: Chrome 60+, Firefox 55+, Safari 11+, Edge 79+
+- **发布**: NPM / CDN / 浏览器直接引入
+- **仓库**: [wu529778790/wechat-auth-sdk](https://github.com/wu529778790/wechat-auth-sdk)
 
 ---
 
