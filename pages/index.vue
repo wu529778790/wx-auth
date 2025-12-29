@@ -24,16 +24,16 @@
 
       <!-- 配置信息展示 -->
       <div class="space-y-3 text-left text-sm bg-[#F8F8F8] p-4 rounded-xl mb-6">
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-[#07C160]">API:</span>
+        <div class="flex items-start gap-2">
+          <span class="font-bold text-[#07C160] whitespace-nowrap">API:</span>
           <span class="text-gray-600 break-all">{{ API_BASE }}</span>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-[#07C160]">公众号:</span>
+        <div class="flex items-start gap-2">
+          <span class="font-bold text-[#07C160] whitespace-nowrap">公众号:</span>
           <span class="text-gray-600">{{ WECHAT_NAME }}</span>
         </div>
-        <div v-if="WECHAT_QRCODE_URL" class="flex items-center gap-2">
-          <span class="font-bold text-[#07C160]">二维码:</span>
+        <div v-if="WECHAT_QRCODE_URL" class="flex items-start gap-2">
+          <span class="font-bold text-[#07C160] whitespace-nowrap">二维码:</span>
           <span class="text-gray-600 text-xs break-all">{{ WECHAT_QRCODE_URL }}</span>
         </div>
       </div>
