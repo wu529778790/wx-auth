@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDK 防删除保护测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #07C160; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔐 SDK 防删除保护测试</h1>
+
+    <div class="test-panel">
+        <h3>测试说明</h3>
+        <p>此页面测试 SDK 的弹窗保护机制，防止用户从控制台删除弹窗。</p>
+        <div id="status"></div>
+    </div>
+
+    <div class="test-panel">
+        <h3>1. 初始化 SDK</h3>
+        <button class="btn btn-primary" onclick="initSDK()">初始化 SDK</button>
+        <button class="btn btn-warning" onclick="requireAuth()">手动触发认证</button>
+    </div>
+
+    <div class="test-panel">
+        <h3>2. 模拟攻击</h3>
+        <button class="btn btn-danger" onclick="deleteModal()">删除弹窗 (remove())</button>
+        <button class="btn btn-danger" onclick="hideModal()">隐藏弹窗 (style.display='none')</button>
+        <button class="btn btn-danger" onclick="clearBody()">清空 body</button>
+    </div>
+
+    <div class="test-panel">
+        <h3>3. 检查状态</h3>
+        <button class="btn btn-primary" onclick="checkStatus()">检查弹窗状态</button>
+        <button class="btn btn-warning" onclick="closeModal()">关闭弹窗</button>
+    </div>
+
+    <div class="test-panel">
+        <h3>日志输出</h3>
+        <div class="log" id="log"></div>
+    </div>
+
+    <script type="module">
+        // 模拟 WxAuth SDK（简化版，用于测试）
+        import { WxAuth } from './wx-auth-sdk/src/index.js';
+        import './wx-auth-sdk/src/wx-auth.css';
+
+        // 重写 console.log 和 console.warn 以显示在页面上
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : type === 'warn' ? '#ffd93d' : '#00ff00';
+            logDiv.innerHTML += `<div style="color: ${color}; margin: 2px 0;">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        console.log = (...args) => {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        console.warn = (...args) => {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warn');
+        };
+        console.error = (...args) => {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+
+        // 暴露到全局
+        window.WxAuth = WxAuth;
+
+        // 初始化配置
+        window.initSDK = function() {
+            try {
+                WxAuth.init({
+                    apiBase: 'https://example.com',
+                    wechatName: '测试公众号',
+                    qrcodeUrl: 'https://via.placeholder.com/200x200/07C160/ffffff?text=QR',
+                    onVerified: (user) => {
+                        addLog('✅ 验证成功: ' + JSON.stringify(user), 'info');
+                    },
+                    onError: (error) => {
+                        addLog('❌ 错误: ' + error, 'error');
+                    }
+                });
+                addLog('SDK 初始化完成', 'info');
+                showStatus('SDK 已初始化', 'success');
+            } catch (e) {
+                addLog('初始化失败: ' + e.message, 'error');
+                showStatus('初始化失败', 'error');
+            }
+        };
+
+        window.requireAuth = function() {
+            WxAuth.requireAuth().then(result => {
+                addLog('requireAuth 结果: ' + result, 'info');
+            });
+        };
+
+        window.deleteModal = function() {
+            const modal = document.getElementById('wx-auth-modal');
+            if (modal) {
+                modal.remove();
+                addLog('💥 已执行: modal.remove()', 'warn');
+            } else {
+                addLog('⚠️ 弹窗不存在', 'warn');
+            }
+        };
+
+        window.hideModal = function() {
+            const modal = document.getElementById('wx-auth-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                addLog('💥 已执行: modal.style.display="none"', 'warn');
+            } else {
+                addLog('⚠️ 弹窗不存在', 'warn');
+            }
+        };
+
+        window.clearBody = function() {
+            const modal = document.getElementById('wx-auth-modal');
+            if (modal) {
+                document.body.innerHTML = '';
+                addLog('💥 已执行: body.innerHTML = ""', 'warn');
+            } else {
+                addLog('⚠️ 弹窗不存在', 'warn');
+            }
+        };
+
+        window.checkStatus = function() {
+            const modal = document.getElementById('wx-auth-modal');
+            const status = document.getElementById('status');
+            if (modal) {
+                const display = modal.style.display;
+                const isProtected = display !== 'none';
+                addLog(`✅ 弹窗存在, display: ${display}`, 'info');
+                showStatus(`弹窗存在，状态: ${display}`, isProtected ? 'success' : 'error');
+            } else {
+                addLog('❌ 弹窗不存在', 'error');
+                showStatus('弹窗不存在', 'error');
+            }
+        };
+
+        window.closeModal = function() {
+            WxAuth.close();
+            addLog('🔄 已调用 WxAuth.close()', 'info');
+        };
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        // 页面加载时自动初始化
+        setTimeout(() => {
+            addLog('页面加载完成，请点击"初始化 SDK"按钮开始测试', 'info');
+        }, 100);
+    </script>
+</body>
+</html>

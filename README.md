@@ -174,17 +174,94 @@ wechat-subscription-auth/
 │   ├── index.vue               # 认证页面
 │   └── sdk/
 │       └── demo.vue            # SDK 演示页面（访问 /sdk/demo）
-├── sdk/                        # SDK 说明文档
-│   ├── README.md               # SDK 使用说明
-│   └── QUICKSTART-SIMPLE.md    # 快速开始指南
 ├── data/
 │   └── auth-data.json          # 数据存储
 ├── nuxt.config.ts
 ├── package.json
 └── .env                        # 环境变量
+
+# SDK 模块（独立）
+wx-auth-sdk/
+├── src/
+│   ├── index.ts                # SDK 入口
+│   ├── wx-auth.ts              # 主 SDK（认证逻辑）
+│   ├── protection.ts           # ✨ 弹窗保护模块（独立）
+│   ├── wx-auth.css             # 样式
+│   └── protection.md           # 保护模块文档
+├── vite.config.ts              # 构建配置
+└── package.json
 ```
 
 **SDK 独立仓库**：`@wu529778790/wechat-auth-sdk` - [GitHub](https://github.com/wu529778790/wechat-auth-sdk) | [NPM](https://www.npmjs.com/package/@wu529778790/wechat-auth-sdk)
+
+---
+
+## 🛡️ SDK 架构（2025-12-29 更新）
+
+### 核心模块
+
+```
+wx-auth-sdk/
+├── src/
+│   ├── index.ts              # SDK 入口
+│   ├── wx-auth.ts            # 主 SDK（认证逻辑）
+│   ├── protection.ts         # ✨ 弹窗保护模块（独立）
+│   ├── wx-auth.css           # 样式
+│   └── protection.md         # 保护模块文档
+```
+
+### Protection 模块（防删除保护）
+
+**新增独立模块**，防止用户从控制台删除认证弹窗：
+
+```typescript
+// protection.ts - 可独立使用
+export const Protection = {
+  enable(config: ProtectionConfig)    // 启用保护
+  disable()                           // 禁用保护
+  healthCheck(config)                 // 定时检查
+  restore(config)                     // 恢复弹窗
+};
+```
+
+**保护机制**：
+- ✅ **MutationObserver** - 实时检测 DOM 删除/隐藏
+- ✅ **定时器兜底** - 每秒检查一次（≤ 1000ms）
+- ✅ **智能恢复** - 防止循环，保留配置
+- ✅ **零依赖** - 原生 JavaScript
+
+**支持的攻击防御**：
+```javascript
+// 以下操作都会被自动恢复
+document.getElementById('wx-auth-modal').remove();
+modal.style.display = 'none';
+document.body.innerHTML = '';
+```
+
+**使用方式**（自动集成）：
+```typescript
+// wx-auth.ts 中已集成
+UI.show() {
+  Protection.enable({
+    modalId: "wx-auth-modal",
+    getState: () => state,
+    onRestore: () => { /* 恢复逻辑 */ }
+  });
+}
+```
+
+**独立使用**（可选）：
+```typescript
+import { Protection } from './protection';
+
+Protection.enable({
+  modalId: "my-modal",
+  getState: () => ({ isOpen: true }),
+  onRestore: () => { /* 自定义恢复 */ }
+});
+```
+
+**详细文档**：`wx-auth-sdk/src/protection.md`
 
 ---
 
@@ -474,6 +551,12 @@ await WxAuth.requireAuth();
 - **兼容性**: Chrome 60+, Firefox 55+, Safari 11+, Edge 79+
 - **发布**: NPM / CDN / 浏览器直接引入
 - **仓库**: [wu529778790/wechat-auth-sdk](https://github.com/wu529778790/wechat-auth-sdk)
+
+**SDK 模块架构**：
+- `wx-auth.ts` (534行) - 主 SDK，认证逻辑
+- `protection.ts` (160行) - 弹窗保护模块（独立）
+- `wx-auth.css` (149行) - 样式
+- **总计**: 843行代码，模块化设计
 
 ---
 

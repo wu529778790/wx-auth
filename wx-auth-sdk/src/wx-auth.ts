@@ -6,6 +6,7 @@
  * - 复用现有后端 API
  * - 无额外依赖
  * - 总大小 < 10KB
+ * - 弹窗防删除保护
  *
  * 使用方法：
  *
@@ -22,6 +23,8 @@
  * 3. 使用
  *    await WxAuth.requireAuth();
  */
+
+import { Protection } from './protection';
 
 // 配置类型
 interface WxAuthConfig {
@@ -225,6 +228,28 @@ const UI = {
     }
     modal.style.display = "flex";
     state.isOpen = true;
+
+    // 启用弹窗保护
+    Protection.enable({
+      modalId: "wx-auth-modal",
+      getState: () => state,
+      onRestore: () => {
+        // 重新创建弹窗并恢复配置
+        this.createModal();
+        if (config.qrcodeUrl) {
+          this.setQrCode(config.qrcodeUrl);
+        }
+        const desc = document.querySelector<HTMLElement>(".wx-auth-desc");
+        if (desc && config.wechatName) {
+          desc.textContent = `1. 微信关注公众号 "${config.wechatName}"`;
+        }
+        this.bindInputEvents();
+        setTimeout(() => {
+          const firstInput = document.querySelector<HTMLInputElement>(".wx-auth-input");
+          if (firstInput) firstInput.focus();
+        }, 100);
+      },
+    });
   },
 
   // 隐藏弹窗
@@ -233,6 +258,9 @@ const UI = {
     if (modal) {
       modal.style.display = "none";
       state.isOpen = false;
+
+      // 禁用弹窗保护
+      Protection.disable();
     }
   },
 
@@ -299,7 +327,7 @@ export const WxAuth = {
     console.log("[WxAuth] SDK initialized", config);
 
     // 自动检测 Cookie 并静默认证
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       this.autoCheck();
     }
   },
