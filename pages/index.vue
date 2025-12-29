@@ -26,15 +26,15 @@
       <div class="space-y-3 text-left text-sm bg-[#F8F8F8] p-4 rounded-xl mb-6">
         <div class="flex items-center gap-2">
           <span class="font-bold text-[#07C160]">API:</span>
-          <span class="text-gray-600 break-all">{{ config.public.apiBase }}</span>
+          <span class="text-gray-600 break-all">{{ API_BASE }}</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="font-bold text-[#07C160]">公众号:</span>
-          <span class="text-gray-600">{{ config.public.wechatName }}</span>
+          <span class="text-gray-600">{{ WECHAT_NAME }}</span>
         </div>
-        <div v-if="config.public.wechatQrcodeUrl" class="flex items-center gap-2">
+        <div v-if="WECHAT_QRCODE_URL" class="flex items-center gap-2">
           <span class="font-bold text-[#07C160]">二维码:</span>
-          <span class="text-gray-600 text-xs break-all">{{ config.public.wechatQrcodeUrl }}</span>
+          <span class="text-gray-600 text-xs break-all">{{ WECHAT_QRCODE_URL }}</span>
         </div>
       </div>
 
@@ -90,7 +90,18 @@
 import { WxAuth } from '../vite-sdk/src/index';
 import '../vite-sdk/src/wx-auth.css';
 
-const config = useRuntimeConfig();
+// ==================== SDK 配置（修改这里） ====================
+// 你的后端 API 地址（必填）
+const API_BASE = 'http://localhost:3000';
+
+// 公众号名称（可选，用于显示）
+const WECHAT_NAME = '我的公众号';
+
+// 公众号二维码 URL（可选，留空显示默认占位图）
+// 示例: 'https://your-site.com/qrcode.jpg'
+const WECHAT_QRCODE_URL = '';
+// ============================================================
+
 const message = ref<{ type: string; text: string } | null>(null);
 const authenticating = ref(false);
 const authenticated = ref(false);
@@ -120,11 +131,11 @@ async function startAuth(): Promise<void> {
   message.value = null;
 
   try {
-    // 初始化 SDK（使用 nuxt.config.ts 中的默认配置）
+    // 初始化 SDK（使用页面顶部的配置）
     WxAuth.init({
-      apiBase: config.public.apiBase,
-      wechatName: config.public.wechatName,
-      qrcodeUrl: config.public.wechatQrcodeUrl,
+      apiBase: API_BASE,
+      wechatName: WECHAT_NAME,
+      qrcodeUrl: WECHAT_QRCODE_URL,
       onVerified: (user) => {
         console.log('[Index] 验证成功', user);
         authenticated.value = true;

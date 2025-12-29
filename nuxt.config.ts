@@ -30,27 +30,15 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // 公开配置（客户端可用）
     public: {
-      siteUrl: process.env.SITE_URL || 'http://localhost:3000',
-      // SDK API Base URL（用于前端 SDK）
-      apiBase: process.env.API_BASE || 'https://auth.shenzjd.com',
-      // 公众号名称（用于前端显示）
-      wechatName: process.env.WECHAT_NAME || '神族九帝',
-      // 公众号二维码URL（用于前端显示）
-      wechatQrcodeUrl: process.env.WECHAT_QRCODE_URL || 'https://gcore.jsdelivr.net/gh/wu529778790/image/blog/qrcode_for_gh_61da24be23ff_258.jpg',
-      // 多公众号配置（支持多个订阅号）
-      wechatAccounts: JSON.parse(process.env.WECHAT_ACCOUNTS || '[]')
+      siteUrl: process.env.SITE_URL || 'http://localhost:3000'
     },
     // 私有配置（仅服务端可用）
     wechat: {
-      // 默认公众号配置（向后兼容）
+      // 微信后台配置
       appId: process.env.WECHAT_APPID,
       appSecret: process.env.WECHAT_APPSECRET,
       token: process.env.WECHAT_TOKEN,
-      aesKey: process.env.WECHAT_AES_KEY || '',
-      // 公众号名称（服务端使用）
-      name: process.env.WECHAT_NAME || '我的公众号',
-      // 公众号二维码URL（服务端使用）
-      qrcodeUrl: process.env.WECHAT_QRCODE_URL || ''
+      aesKey: process.env.WECHAT_AES_KEY || ''
     },
     session: {
       secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
