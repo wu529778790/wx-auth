@@ -13,7 +13,37 @@
 - ✅ **安全可靠** - AES-256-GCM 加密 Session
 - ✅ **用户体验** - 自动聚焦、粘贴支持、键盘导航
 - ✅ **灵活存储** - JSON 文件 / SQLite 双支持
-- ✅ **多平台接入** - 提供完整的接入指南
+- ✅ **轻量 SDK** - 提供 < 12KB 的嵌入式 SDK
+
+---
+
+## 🆕 新增：极简 SDK
+
+现在提供**极简版 SDK**，可在任何网站中嵌入微信订阅号验证：
+
+```javascript
+// 仅需 3 行代码
+WxAuth.init({ apiBase: 'https://your-api.com' });
+await WxAuth.requireAuth();
+```
+
+**特点**：
+- 📦 总计 < 12KB（JS 8KB + CSS 4KB）
+- ⚡ 仅需配置 `apiBase` 参数
+- 🔧 无需后端任何改动
+- 🎨 微信原生风格弹窗
+
+**快速开始**：
+```bash
+# 下载 SDK 文件
+sdk/wx-auth-simple.js
+sdk/wx-auth-simple.css
+
+# 查看文档
+sdk/QUICKSTART-SIMPLE.md
+```
+
+**在线演示**：访问 `http://localhost:3000/sdk/demo-simple.html`
 
 ---
 
@@ -108,28 +138,29 @@ pnpm dev
 
 ```
 wechat-subscription-auth/
-├── server/
+├── server/                     # 后端服务
 │   ├── api/
 │   │   ├── wechat/
-│   │   │   └── message.ts      # 微信消息处理（关注发验证码）
+│   │   │   └── message.ts      # 微信消息处理
 │   │   └── auth/
-│   │       ├── check.ts        # 验证码验证接口
+│   │       ├── check.ts        # 验证码验证
 │   │       └── session.ts      # Session 管理
 │   └── utils/
-│       ├── wechat.ts           # 微信加解密、签名、XML处理
-│       ├── storage.ts          # JSON/SQLite 存储
-│       ├── session.ts          # 加密 Cookie Session
-│       └── db.ts               # SQLite 数据库管理
+│       ├── wechat.ts           # 微信工具
+│       ├── storage.ts          # 存储层
+│       └── session.ts          # Session 工具
 ├── pages/
-│   └── index.vue               # 认证页面（完整UI + 交互）
-├── assets/
-│   └── css/
-│       └── main.css            # Tailwind CSS 配置
+│   └── index.vue               # 认证页面
+├── sdk/                        # 极简 SDK（新增）
+│   ├── wx-auth-simple.js       # SDK 核心 (~8KB)
+│   ├── wx-auth-simple.css      # SDK 样式 (~4KB)
+│   ├── demo-simple.html        # 演示页面
+│   └── QUICKSTART-SIMPLE.md    # SDK 文档
 ├── data/
-│   └── auth-data.json          # 数据存储（自动生成）
-├── nuxt.config.ts              # Nuxt 配置
+│   └── auth-data.json          # 数据存储
+├── nuxt.config.ts
 ├── package.json
-└── .env                        # 环境变量（需自己创建）
+└── .env                        # 环境变量
 ```
 
 ---
@@ -374,16 +405,37 @@ WECHAT_ACCOUNTS=[{"name":"公众号A","token":"token1"},{"name":"公众号B","to
 ### Q: 如何自定义界面？
 **A**: 修改 `pages/index.vue` 和 `assets/css/main.css`
 
+### Q: 如何在其他网站中使用？
+**A**: 使用极简 SDK：
+```javascript
+// 引入 SDK
+<link rel="stylesheet" href="sdk/wx-auth-simple.css">
+<script src="sdk/wx-auth-simple.js"></script>
+
+// 初始化
+WxAuth.init({ apiBase: 'https://your-api.com' });
+
+// 使用
+await WxAuth.requireAuth();
+```
+详细文档：`sdk/QUICKSTART-SIMPLE.md`
+
 ---
 
 ## 📊 项目统计
 
+**后端服务**：
 - **核心文件**: 18个
 - **代码行数**: ~1500行
 - **依赖包**: 3个生产依赖
 - **技术栈**: Nuxt 4 + Vue 3 + TypeScript + Tailwind CSS
 - **存储**: JSON 文件 / SQLite
 - **加密**: AES-256-GCM / AES-256-CBC / SHA1
+
+**极简 SDK**：
+- **文件大小**: < 12KB (JS 8KB + CSS 4KB)
+- **依赖**: 零依赖（原生 JS）
+- **兼容性**: Chrome 60+, Firefox 55+, Safari 11+, Edge 79+
 
 ---
 
