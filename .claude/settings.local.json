@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm run build:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(tree:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm build:*)"
+    ]
+  }
+}

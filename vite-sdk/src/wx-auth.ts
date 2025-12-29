@@ -241,11 +241,40 @@ const UI = {
     if (!url) return;
     const img = document.querySelector<HTMLImageElement>('.wx-auth-qrcode');
     const placeholder = document.querySelector<HTMLElement>('.wx-auth-placeholder');
-    if (img) {
-      img.src = url;
-      img.style.display = 'block';
-      if (placeholder) placeholder.style.display = 'none';
+    if (!img) return;
+
+    // 显示加载中状态
+    if (placeholder) {
+      placeholder.innerHTML = '<div class="wx-auth-icon">⏳</div><div>加载中...</div>';
     }
+
+    // 预加载图片
+    const tempImg = new Image();
+    tempImg.onload = () => {
+      // 图片加载完成后，先设置 src
+      img.src = url;
+
+      // 淡出占位符
+      if (placeholder) {
+        placeholder.classList.add('fade-out');
+        setTimeout(() => {
+          placeholder.style.display = 'none';
+          // 淡入图片
+          img.style.display = 'block';
+        }, 200);
+      } else {
+        img.style.display = 'block';
+      }
+    };
+
+    tempImg.onerror = () => {
+      // 加载失败，恢复默认占位符
+      if (placeholder) {
+        placeholder.innerHTML = '<div class="wx-auth-icon">📷</div><div>二维码</div>';
+      }
+    };
+
+    tempImg.src = url;
   },
 
   // 显示消息

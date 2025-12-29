@@ -123,6 +123,12 @@
   height: 100%;
   display: none;
   object-fit: contain;
+  animation: fadeInImage 0.3s ease;
+}
+
+@keyframes fadeInImage {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .wx-auth-placeholder {
@@ -134,8 +140,13 @@
   font-size: 13px;
   text-align: center;
   line-height: 1.4;
-  white-space: nowrap; /* 防止文字换行 */
-  min-width: 60px; /* 确保有足够宽度 */
+  white-space: nowrap;
+  min-width: 60px;
+  transition: opacity 0.2s ease;
+}
+
+.wx-auth-placeholder.fade-out {
+  opacity: 0;
 }
 
 .wx-auth-icon {
