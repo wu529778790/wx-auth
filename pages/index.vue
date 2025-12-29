@@ -78,8 +78,8 @@
 
 <script setup lang="ts">
 // 导入 SDK
-import { WxAuth } from '../vite-sdk/src/index';
-import '../vite-sdk/src/wx-auth.css';
+import { WxAuth } from '../wx-auth-sdk/src/index';
+import '../wx-auth-sdk/src/wx-auth.css';
 
 // ==================== SDK 配置（修改这里） ====================
 // 你的后端 API 地址（必填）
