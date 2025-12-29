@@ -1,0 +1,35 @@
+# Docker Compose 覆盖文件 - 开发环境配置
+# 使用: docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+
+version: '3.8'
+
+services:
+  wx-auth:
+    # 开发环境使用源代码挂载，便于实时调试
+    volumes:
+      - ./data:/app/data
+      - ./server:/app/server:ro
+      - ./pages:/app/pages:ro
+      - ./wx-auth-sdk/src:/app/wx-auth-sdk/src:ro
+
+    # 开发环境环境变量
+    environment:
+      - NODE_ENV=development
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+
+    # 开发环境不重启
+    restart: "no"
+
+    # 开发环境日志更详细
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 开发环境可以添加 Redis 等服务
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"

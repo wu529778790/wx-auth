@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  wx-auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wx-auth-system
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # 必须配置
+      - SITE_URL=${SITE_URL}
+      - WECHAT_TOKEN=${WECHAT_TOKEN}
+      - SESSION_SECRET=${SESSION_SECRET}
+
+      # 可选配置
+      - WECHAT_NAME=${WECHAT_NAME:-微信公众号}
+      - WECHAT_QRCODE_URL=${WECHAT_QRCODE_URL:-}
+      - WECHAT_AES_KEY=${WECHAT_AES_KEY:-}
+      - CODE_EXPIRY=${CODE_EXPIRY:-300}
+      - KEYWORDS=${KEYWORDS:-["验证码"]}
+      - STORAGE_TYPE=${STORAGE_TYPE:-file}
+      - POLL_INTERVAL=${POLL_INTERVAL:-3000}
+      - POLL_TIMEOUT=${POLL_TIMEOUT:-300000}
+
+      # 生产环境优化
+      - NODE_ENV=production
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+
+    volumes:
+      # 持久化数据
+      - ./data:/app/data
+
+    # 资源限制（可选）
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M

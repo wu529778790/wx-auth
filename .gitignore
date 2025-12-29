@@ -40,3 +40,18 @@ Thumbs.db
 # Lock files (可选，如果使用 pnpm 就保留 pnpm-lock.yaml)
 # package-lock.json
 # yarn.lock
+
+# Docker
+data/
+logs/
+ssl/
+
+# 临时部署文件
+.DS_Store
+Thumbs.db
+
+# 测试和临时文件
+test-*.html
+PROTECTION_TEST.md
+REFACTORING_SUMMARY.md
+
