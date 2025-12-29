@@ -35,8 +35,6 @@ export default defineNuxtConfig({
     // 私有配置（仅服务端可用）
     wechat: {
       // 微信后台配置
-      appId: process.env.WECHAT_APPID,
-      appSecret: process.env.WECHAT_APPSECRET,
       token: process.env.WECHAT_TOKEN,
       aesKey: process.env.WECHAT_AES_KEY || ''
     },

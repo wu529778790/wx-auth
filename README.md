@@ -143,7 +143,7 @@ pnpm dev
 | **消息模式** | **明文模式** 或 **安全模式** |
 
 **安全模式支持**：
-- 需要配置 `WECHAT_AES_KEY` 和 `WECHAT_APPID`
+- 需要配置 `WECHAT_AES_KEY`
 - 系统自动识别并处理加密消息
 
 ---
@@ -329,8 +329,6 @@ pm2 start .output/server/index.mjs --name wechat-auth
 |--------|------|--------|
 | `WECHAT_QRCODE_URL` | 二维码图片 URL | 空（显示占位图） |
 | `WECHAT_AES_KEY` | 微信安全模式 EncodingAESKey | 空（明文模式） |
-| `WECHAT_APPID` | 微信 AppID（安全模式需要） | 空 |
-| `WECHAT_APPSECRET` | 微信 AppSecret | 空 |
 | `CODE_EXPIRY` | 验证码有效期（秒） | `300` (5分钟) |
 | `POLL_INTERVAL` | 前端轮询间隔（毫秒） | `3000` (3秒) |
 | `POLL_TIMEOUT` | 前端轮询超时（毫秒） | `300000` (5分钟) |
