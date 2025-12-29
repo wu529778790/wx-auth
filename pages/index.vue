@@ -92,7 +92,7 @@ import '../vite-sdk/src/wx-auth.css';
 
 // ==================== SDK 配置（修改这里） ====================
 // 你的后端 API 地址（必填）
-const API_BASE = 'http://localhost:3000';
+const API_BASE = 'https://auth.shenzjd.com';
 
 // 公众号名称（可选，用于显示）
 const WECHAT_NAME = '神族九帝';
