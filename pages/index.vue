@@ -1,53 +1,51 @@
 <template>
-  <div class="min-h-screen bg-[#eee] flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl p-8 text-center animate-fade-in shadow-xl">
-      <div class="text-5xl mb-3">🔐</div>
-      <h2 class="text-xl font-bold text-gray-800 mb-1">微信订阅号认证</h2>
-      <p class="text-gray-500 mb-6 text-sm">SDK 演示页面</p>
+  <div class="min-h-screen bg-gray-50 p-8">
+    <div class="max-w-2xl mx-auto space-y-6">
+      <!-- 头部 -->
+      <div class="border-b border-gray-200 pb-4">
+        <h1 class="text-2xl font-bold text-gray-800">微信订阅号认证 SDK</h1>
+        <p class="text-gray-500 mt-1">演示页面</p>
+      </div>
 
-      <!-- 配置信息展示 -->
-      <div class="space-y-3 text-left text-sm bg-[#F8F8F8] p-4 rounded-xl mb-6">
-        <div class="flex items-start gap-2">
-          <span class="font-bold text-[#07C160] whitespace-nowrap">API:</span>
-          <span class="text-gray-600 break-all">{{ API_BASE }}</span>
-        </div>
-        <div class="flex items-start gap-2">
-          <span class="font-bold text-[#07C160] whitespace-nowrap">公众号:</span>
-          <span class="text-gray-600">{{ WECHAT_NAME }}</span>
-        </div>
-        <div v-if="WECHAT_QRCODE_URL" class="flex items-start gap-2">
-          <span class="font-bold text-[#07C160] whitespace-nowrap">二维码:</span>
-          <span class="text-gray-600 text-xs break-all">{{ WECHAT_QRCODE_URL }}</span>
+      <!-- 配置信息 -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-3">配置信息</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex gap-2">
+            <span class="font-bold text-[#07C160] w-16">API:</span>
+            <span class="text-gray-600 break-all">{{ API_BASE }}</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="font-bold text-[#07C160] w-16">公众号:</span>
+            <span class="text-gray-600">{{ WECHAT_NAME }}</span>
+          </div>
+          <div v-if="WECHAT_QRCODE_URL" class="flex gap-2">
+            <span class="font-bold text-[#07C160] w-16">二维码:</span>
+            <span class="text-gray-600 text-xs break-all">{{ WECHAT_QRCODE_URL }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- 清空认证状态按钮（会自动触发重新认证） -->
-      <button
-        v-if="hasAuthCookie"
-        @click="clearAuth"
-        class="w-full py-4 bg-[#07C160] hover:bg-[#06AD56] text-white rounded-xl font-bold text-base transition-all shadow-lg active:scale-[0.98]">
-        清空认证状态
-      </button>
+      <!-- 操作按钮 -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-3">操作</h3>
+        <button
+          v-if="hasAuthCookie"
+          @click="clearAuth"
+          class="w-full py-3 bg-[#07C160] hover:bg-[#06AD56] text-white rounded-lg font-bold transition-all active:scale-[0.98]">
+          清空认证状态
+        </button>
+        <div v-else class="text-gray-500 text-sm">当前未认证，认证窗口将在页面加载时自动显示</div>
+      </div>
 
-      <!-- 说明步骤 -->
-      <div class="mt-6 text-left">
-        <div class="bg-[#F8F8F8] rounded-xl p-4 space-y-3 border border-[#E5E5E5]">
-          <div class="flex items-start gap-3">
-            <span class="w-6 h-6 bg-[#07C160] text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">1</span>
-            <span class="text-gray-700 text-sm leading-relaxed">首次访问自动弹出认证窗口</span>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-6 h-6 bg-[#07C160] text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">2</span>
-            <span class="text-gray-700 text-sm leading-relaxed">微信扫码，输入6位验证码</span>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-6 h-6 bg-[#07C160] text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">3</span>
-            <span class="text-gray-700 text-sm leading-relaxed">认证成功自动保存 Cookie</span>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-6 h-6 bg-[#07C160] text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">4</span>
-            <span class="text-gray-700 text-sm leading-relaxed">下次访问自动认证，无需操作</span>
-          </div>
+      <!-- 说明 -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-3">认证流程</h3>
+        <div class="space-y-2 text-sm text-gray-600">
+          <div>1. 首次访问自动弹出认证窗口</div>
+          <div>2. 微信扫码，输入6位验证码</div>
+          <div>3. 认证成功自动保存 Cookie</div>
+          <div>4. 下次访问自动认证，无需操作</div>
         </div>
       </div>
     </div>
