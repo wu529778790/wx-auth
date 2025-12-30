@@ -44,6 +44,7 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/node": "^22.19.3",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",
     "vite-plugin-dts": "^4.5.4"

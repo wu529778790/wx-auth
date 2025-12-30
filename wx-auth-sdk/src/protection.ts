@@ -39,7 +39,7 @@ export const Protection = {
   enable(config: ProtectionConfig): void {
     if (protection.isProtected || typeof window === "undefined") return;
 
-    const { modalId, getState, onRestore } = config;
+    const { modalId, getState } = config;
 
     // MutationObserver - 实时检测 DOM 变化
     protection.observer = new MutationObserver((mutations) => {
