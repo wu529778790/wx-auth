@@ -561,20 +561,25 @@ WxAuth.init({
 
 ## 📚 文档说明
 
-为保持项目简洁，已将详细文档整合到 README 中：
+为保持项目简洁，已清理重复文档：
 
 | 原文档 | 状态 | 说明 |
 |--------|------|------|
-| `CHANGELOG.md` | ✅ 已整合 | 更新日志已合并到本 README |
-| `DEPLOYMENT.md` | ✅ 已整合 | Docker 部署指南已整合 |
-| `DOCKER_DEPLOYMENT.md` | ✅ 已整合 | 完整部署文档已整合 |
-| `PROTECTION_TEST.md` | ✅ 已整合 | SDK 保护机制已说明 |
-| `TEST_SUMMARY.md` | ✅ 已整合 | 测试报告已整合 |
-| `wx-auth-sdk/README.md` | ✅ 已整合 | SDK 文档已整合 |
+| `CHANGELOG.md` | ✅ 已整合 | 更新日志合并到本 README |
+| `DEPLOYMENT.md` | ✅ 已整合 | Docker 部署指南合并 |
+| `DOCKER_DEPLOYMENT.md` | ✅ 已整合 | 完整部署文档合并 |
+| `PROTECTION_TEST.md` | ✅ 已整合 | SDK 保护机制说明合并 |
+| `TEST_SUMMARY.md` | ✅ 已整合 | 测试报告合并 |
 
 **保留的文档**：
 - `README.md` - 本文件（完整项目文档）
+- `wx-auth-sdk/README.md` - SDK 独立文档（用于 NPM 发布）
 - `CLAUDE.md` - 开发指南（仅开发人员使用）
+
+**说明**：
+- 主 README 包含完整的项目说明和快速开始
+- SDK README 用于独立使用或 NPM 包发布
+- CLAUDE.md 包含开发相关的技术细节
 
 ---
 
