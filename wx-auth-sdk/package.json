@@ -1,6 +1,6 @@
 {
   "name": "wx-auth-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "微信订阅号认证 SDK - 极简版",
   "type": "module",
   "main": "./dist/wx-auth.umd.js",
