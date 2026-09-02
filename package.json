@@ -1,0 +1,24 @@
+{
+  "name": "wx-auth",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "generate": "nuxt generate"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "7.0.0-beta.1",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^22.10.2",
+    "nuxt": "^4.2.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.4",
+    "fast-xml-parser": "^5.3.3",
+    "ofetch": "^1.4.1"
+  }
+}

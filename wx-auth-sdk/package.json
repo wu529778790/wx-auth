@@ -1,0 +1,64 @@
+{
+  "name": "wx-auth-sdk",
+  "version": "1.2.23",
+  "description": "微信订阅号认证 SDK - 极简版",
+  "type": "module",
+  "main": "./dist/wx-auth.umd.js",
+  "module": "./dist/wx-auth.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/wx-auth.js",
+      "require": "./dist/wx-auth.umd.js"
+    },
+    "./dist/style.css": "./dist/wx-auth.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "wechat",
+    "wx",
+    "auth",
+    "subscription",
+    "sdk",
+    "微信认证",
+    "订阅号",
+    "公众号",
+    "微信",
+    "认证",
+    "订阅号认证",
+    "公众号认证",
+    "微信认证",
+    "微信订阅号认证",
+    "微信订阅号认证系统",
+    "微信订阅号认证SDK"
+  ],
+  "author": "wu529778790",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wu529778790/wx-auth.git",
+    "directory": "wx-auth-sdk"
+  },
+  "homepage": "https://github.com/wu529778790/wx-auth/tree/main/wx-auth-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/wu529778790/wx-auth/issues"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.3",
+    "jsdom": "^30.0.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.11"
+  }
+}

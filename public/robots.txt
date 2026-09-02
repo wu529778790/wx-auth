@@ -1,0 +1,17 @@
+# wx-auth — 微信订阅号认证服务
+# 这是一个 API 服务 + 单页演示站，无可爬取内容
+User-agent: *
+Disallow: /
+
+# 明确阻止扫描器（遵循协议的）
+User-agent: *
+Disallow: /api/
+Disallow: /admin/
+Disallow: /.env
+Disallow: /.git/
+
+# 减缓扫描速率
+Crawl-delay: 10
+
+# Sitemap（无可爬取内容）
+# Sitemap: https://wx-auth.shenzjd.com/sitemap.xml

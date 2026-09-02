@@ -1,0 +1,58 @@
+# Git
+.git
+.gitignore
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Nuxt
+.nuxt
+.nuxt-dist
+.output
+dist
+build
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+
+# 日志
+*.log
+
+# SDK 源代码（如果不需要在容器中构建 SDK）
+wx-auth-sdk/node_modules
+wx-auth-sdk/dist
+
+# 文档（保留必要的）
+# README.md
+# CHANGELOG.md
+
+# 测试文件
+test-*.html
+PROTECTION_TEST.md
+REFACTORING_SUMMARY.md
+
+# Nginx
+nginx.conf
+
+# GitHub Actions（保留，用于自动构建）
+# .github/
